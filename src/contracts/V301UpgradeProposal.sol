@@ -1,47 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 import {IPoolAddressesProvider, IPool, IPoolConfigurator, DataTypes} from 'aave-address-book/AaveV3.sol';
-import {AaveProtocolDataProvider} from 'aave-v3-core/contracts/misc/AaveProtocolDataProvider.sol';
-import {Pool} from 'aave-v3-core/contracts/protocol/pool/Pool.sol';
+import {IProposalGenericExecutor} from 'aave-helpers/interfaces/IProposalGenericExecutor.sol';
+import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/types/ConfiguratorInputTypes.sol';
+// TODO: use interface
 import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
-import {PoolConfigurator} from 'aave-v3-core/contracts/protocol/pool/PoolConfigurator.sol';
-import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/types/ConfiguratorInputTypes.sol';
 
-contract V301UpgradeProposal {
+contract V301UpgradeProposal is IProposalGenericExecutor {
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
+  address public immutable COLLECTOR;
+  address public immutable INCENTIVES_CONTROLLER;
+
+  address public immutable NEW_POOL_IMPL;
+  address public immutable NEW_POOL_CONFIGURATOR_IMPL;
+  address public immutable NEW_PROTOCOL_DATA_PROVIDER;
+  address public immutable NEW_ATOKEN_IMPL;
+  address public immutable NEW_VTOKEN_IMPL;
 
   constructor(
     IPoolAddressesProvider poolAddressesProvider,
     IPool pool,
-    IPoolConfigurator poolConfigurator
+    IPoolConfigurator poolConfigurator,
+    address collector,
+    address incentivesController,
+    address newPoolImpl,
+    address newPoolConfiguratorImpl,
+    address newProtocolDataProvider,
+    address newATokenImpl,
+    address newVTokenImpl
   ) {
     POOL_ADDRESSES_PROVIDER = poolAddressesProvider;
     POOL = pool;
     POOL_CONFIGURATOR = poolConfigurator;
+    COLLECTOR = collector;
+    INCENTIVES_CONTROLLER = incentivesController;
+
+    NEW_POOL_IMPL = newPoolImpl;
+    NEW_POOL_CONFIGURATOR_IMPL = newPoolConfiguratorImpl;
+    NEW_PROTOCOL_DATA_PROVIDER = newProtocolDataProvider;
+    NEW_ATOKEN_IMPL = newATokenImpl;
+    NEW_VTOKEN_IMPL = newVTokenImpl;
   }
 
   function execute() public {
-    Pool newPoolImpl = new Pool(POOL_ADDRESSES_PROVIDER);
-    POOL_ADDRESSES_PROVIDER.setPoolImpl(address(newPoolImpl));
+    POOL_ADDRESSES_PROVIDER.setPoolImpl(NEW_POOL_IMPL);
 
-    PoolConfigurator newConfiguratorImpl = new PoolConfigurator();
-    POOL_ADDRESSES_PROVIDER.setPoolConfiguratorImpl(address(newConfiguratorImpl));
+    POOL_ADDRESSES_PROVIDER.setPoolConfiguratorImpl(NEW_POOL_CONFIGURATOR_IMPL);
 
-    AaveProtocolDataProvider poolDataProvider = new AaveProtocolDataProvider(
-      POOL_ADDRESSES_PROVIDER
-    );
-    POOL_ADDRESSES_PROVIDER.setPoolDataProvider(address(poolDataProvider));
+    POOL_ADDRESSES_PROVIDER.setPoolDataProvider(NEW_PROTOCOL_DATA_PROVIDER);
 
     _updateTokens();
   }
 
   function _updateTokens() internal {
     address[] memory reserves = POOL.getReservesList();
-    AToken aTokenImpl = new AToken(); // TODO: initialize
-    AToken variableDebtTokenImpl = new AToken(); // TODO: initialize
 
     for (uint256 i = 0; i < reserves.length; i++) {
       DataTypes.ReserveData memory reserveData = POOL.getReserveData(reserves[i]);
@@ -50,11 +65,11 @@ contract V301UpgradeProposal {
       ConfiguratorInputTypes.UpdateATokenInput memory inputAToken = ConfiguratorInputTypes
         .UpdateATokenInput({
           asset: reserves[i],
-          treasury: address(0), // TODO: fetch or set immutable on constructor as it's always the same
-          incentivesController: address(0), // TODO: fetch or set immutable on constructor as it's always the same
+          treasury: COLLECTOR,
+          incentivesController: INCENTIVES_CONTROLLER,
           name: aToken.name(),
           symbol: aToken.symbol(),
-          implementation: address(aTokenImpl),
+          implementation: NEW_ATOKEN_IMPL,
           params: '0x10' // this parameter is not actually used anywhere
         });
 
@@ -64,10 +79,10 @@ contract V301UpgradeProposal {
       ConfiguratorInputTypes.UpdateDebtTokenInput memory inputVToken = ConfiguratorInputTypes
         .UpdateDebtTokenInput({
           asset: reserves[i],
-          incentivesController: address(0), // TODO: fetch or set immutable on constructor as it's always the same
+          incentivesController: INCENTIVES_CONTROLLER,
           name: vToken.name(),
           symbol: vToken.symbol(),
-          implementation: address(variableDebtTokenImpl),
+          implementation: NEW_VTOKEN_IMPL,
           params: '0x10' // this parameter is not actually used anywhere
         });
 
