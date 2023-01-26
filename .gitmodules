@@ -9,3 +9,6 @@
 	path = lib/aave-v3-core
 	url = https://github.com/aave/aave-v3-core
 	branch = v1.17.1
+[submodule "lib/aave-helpers"]
+	path = lib/aave-helpers
+	url = https://github.com/bgd-labs/aave-helpers
