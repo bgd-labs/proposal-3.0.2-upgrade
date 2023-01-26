@@ -72,14 +72,9 @@ function diffContracts(chain, config) {
   Object.keys(config)
     .filter((key) => !INVALID_KEYS.includes(key))
     .map((key) => {
-      const isProxy = PROXIES.includes(key);
-
+      const identifier = PROXIES.includes(key) ? `${key}_IMPL` : key;
       runCmd(
-        `make git-diff before=downloads/${chain}/${
-          isProxy ? `${key}_IMPL` : key
-        } after=downloads/mainnet/${
-          isProxy ? `${key}_IMPL` : key
-        } out=${chain}_${isProxy ? `${key}_IMPL` : key}`
+        `make git-diff before=downloads/${chain}/${identifier} after=downloads/mainnet/${identifier} out=${chain}_${identifier}`
       );
     });
 }
