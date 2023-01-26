@@ -46,6 +46,7 @@ const INVALID_KEYS = [
   "SWAP_COLLATERAL_ADAPTER", // utility
   "LISTING_ENGINE", // utility
   "ACL_ADMIN", // chain specific
+  "COLLECTOR", // done in different proposal
 ];
 
 const PROXIES = [
