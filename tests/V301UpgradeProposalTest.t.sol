@@ -3,22 +3,23 @@ pragma solidity ^0.8.0;
 
 import {TestWithExecutor} from 'aave-helpers/GovHelpers.sol';
 import {AaveGovernanceV2, IExecutorWithTimelock} from 'aave-address-book/AaveGovernanceV2.sol';
-import {AaveV3Polygon} from 'aave-address-book/AaveAddressBook.sol';
+import {AaveV3Polygon, AaveV3Ethereum} from 'aave-address-book/AaveAddressBook.sol';
+import {ProtocolV3_0_1TestBase} from 'aave-helpers/ProtocolV3TestBase.sol';
+
 import {DeployUpgrade} from '../scripts/DeployProposal.s.sol';
 import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
-import {ProtocolV3TestBase, ProtocolV3_0_1TestBase, ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 
-contract V301UpgradeProposalPolygonSnapshot is ProtocolV3TestBase {
+contract V301UpgradeProposalPolygonSnapshot is ProtocolV3_0_1TestBase {
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), 38552998);
   }
 
   function testProposal() public {
-    createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Polygon.POOL);
+    createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Ethereum.POOL);
   }
 }
 
-contract V301UpgradeProposalPolygonTest is TestWithExecutor, ProtocolV3_0_1TestBase {
+contract V301UpgradeProposalPolygonTest is ProtocolV3_0_1TestBase, TestWithExecutor {
   V301UpgradeProposal public proposalPayload;
 
   function setUp() public {
@@ -30,6 +31,6 @@ contract V301UpgradeProposalPolygonTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-polygon', AaveV3Polygon.POOL);
+    //createConfigurationSnapshot('post-upgrade-polygon', AaveV3Polygon.POOL);
   }
 }
