@@ -1,13 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
-import {IPoolAddressesProvider, IPool, IPoolConfigurator, DataTypes} from 'aave-address-book/AaveV3.sol';
-//import {IProposalGenericExecutor} from 'aave-helpers/interfaces/IProposalGenericExecutor.sol';
-import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/types/ConfiguratorInputTypes.sol';
-// TODO: use interface
-import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
-import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
 
-contract V301UpgradeProposal {
+import {IPoolAddressesProvider, IPool, IPoolConfigurator, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IProposalGenericExecutor} from 'aave-helpers/interfaces/IProposalGenericExecutor.sol';
+import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/types/ConfiguratorInputTypes.sol';
+import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/contracts/IERC20Detailed.sol';
+
+contract V301UpgradeProposal is IProposalGenericExecutor {
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
@@ -61,7 +60,7 @@ contract V301UpgradeProposal {
     for (uint256 i = 0; i < reserves.length; i++) {
       DataTypes.ReserveData memory reserveData = POOL.getReserveData(reserves[i]);
 
-      AToken aToken = AToken(reserveData.aTokenAddress);
+      IERC20Detailed aToken = IERC20Detailed(reserveData.aTokenAddress);
       ConfiguratorInputTypes.UpdateATokenInput memory inputAToken = ConfiguratorInputTypes
         .UpdateATokenInput({
           asset: reserves[i],
@@ -75,7 +74,7 @@ contract V301UpgradeProposal {
 
       POOL_CONFIGURATOR.updateAToken(inputAToken);
 
-      VariableDebtToken vToken = VariableDebtToken(reserveData.variableDebtTokenAddress);
+      IERC20Detailed vToken = IERC20Detailed(reserveData.variableDebtTokenAddress);
       ConfiguratorInputTypes.UpdateDebtTokenInput memory inputVToken = ConfiguratorInputTypes
         .UpdateDebtTokenInput({
           asset: reserves[i],
