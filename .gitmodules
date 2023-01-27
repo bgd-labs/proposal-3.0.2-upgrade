@@ -11,3 +11,6 @@
 	path = lib/aave-v3-core
 	url = https://github.com/bgd-labs/aave-v3-core
 	branch = chore/bump-revision
+[submodule "lib/solidity-utils"]
+	path = lib/solidity-utils
+	url = https://github.com/bgd-labs/solidity-utils

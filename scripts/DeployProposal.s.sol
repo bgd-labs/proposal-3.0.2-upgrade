@@ -8,11 +8,19 @@ import {Pool} from 'aave-v3-core/contracts/protocol/pool/Pool.sol';
 import {L2Pool} from 'aave-v3-core/contracts/protocol/pool/L2Pool.sol';
 import {PoolConfigurator} from 'aave-v3-core/contracts/protocol/pool/PoolConfigurator.sol';
 import {AaveProtocolDataProvider} from 'aave-v3-core/contracts/misc/AaveProtocolDataProvider.sol';
+import {IAaveIncentivesController} from 'aave-v3-core/contracts/interfaces/IAaveIncentivesController.sol';
 import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
 
+import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
+
+// temp
+import {AaveV3Polygon} from 'aave-address-book/AaveAddressBook.sol';
+
 library DeployUpgrade {
-  function _deployPoolImpl(IPoolAddressesProvider poolAddressesProvider) public returns (address) {
+  function _deployPoolImpl(
+    IPoolAddressesProvider poolAddressesProvider
+  ) internal returns (address) {
     Pool newPoolImpl = new Pool(poolAddressesProvider);
     newPoolImpl.initialize(poolAddressesProvider);
     return address(newPoolImpl);
@@ -20,7 +28,7 @@ library DeployUpgrade {
 
   function _deployL2PoolImpl(
     IPoolAddressesProvider poolAddressesProvider
-  ) public returns (address) {
+  ) internal returns (address) {
     L2Pool newPoolImpl = new L2Pool(poolAddressesProvider);
     newPoolImpl.initialize(poolAddressesProvider);
     return address(newPoolImpl);
@@ -28,7 +36,7 @@ library DeployUpgrade {
 
   function _deployPoolConfiguratorImpl(
     IPoolAddressesProvider poolAddressesProvider
-  ) public returns (address) {
+  ) internal returns (address) {
     PoolConfigurator newPoolConfiguratorImpl = new PoolConfigurator();
     newPoolConfiguratorImpl.initialize(poolAddressesProvider);
     return address(newPoolConfiguratorImpl);
@@ -36,19 +44,119 @@ library DeployUpgrade {
 
   function _deployProtocolDataProvider(
     IPoolAddressesProvider poolAddressesProvider
-  ) public returns (address) {
+  ) internal returns (address) {
     AaveProtocolDataProvider poolDataProvider = new AaveProtocolDataProvider(poolAddressesProvider);
     return address(poolDataProvider);
   }
 
-  function _deployAToken(IPool pool) public returns (address) {
-    AToken aTokenImpl = new AToken(pool); // TODO: initialize
+  function _deployAToken(IPool pool) internal returns (address) {
+    AToken aTokenImpl = new AToken(pool);
+    // follow empty initialization pattern like in previous deployments
+    // ref: https://etherscan.io/tx/0x5004f1475de545a39a891aa0f3ada15c2dfb6970bf1a080ebd5e10fee4c74dc5
+    aTokenImpl.initialize(
+      pool,
+      address(0),
+      address(0),
+      IAaveIncentivesController(address(0)),
+      0,
+      'ATOKEN_IMPL',
+      'ATOKEN_IMPL',
+      '0x00'
+    );
     return address(aTokenImpl);
   }
 
-  function _deployVToken(IPool pool) public returns (address) {
-    VariableDebtToken variableDebtTokenImpl = new VariableDebtToken(pool); // TODO: initialize
+  function _deployVToken(IPool pool) internal returns (address) {
+    VariableDebtToken variableDebtTokenImpl = new VariableDebtToken(pool);
+    // follow empty initialization pattern like in previous deployments
+    // ref: https://etherscan.io/tx/0xb31ebf63d6814ebbf0c7647d59010dabf75f094dd798f148f31941b872bc0c93
+    variableDebtTokenImpl.initialize(
+      pool,
+      address(0),
+      IAaveIncentivesController(address(0)),
+      0,
+      'VARIABLE_DEBT_TOKEN_IMPL',
+      'VARIABLE_DEBT_TOKEN_IMPL',
+      '0x00'
+    );
     return address(variableDebtTokenImpl);
+  }
+
+  function _deployProposal(
+    IPoolAddressesProvider poolAddressesProvider,
+    IPool pool,
+    IPoolConfigurator poolConfigurator,
+    address collector,
+    address incentivesController,
+    address poolImpl
+  ) internal returns (V301UpgradeProposal) {
+    address poolPoolConfiguratorImpl = _deployPoolConfiguratorImpl(poolAddressesProvider);
+    address protocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
+    address aTokenImpl = _deployAToken(pool);
+    address vTokenImpl = _deployVToken(pool);
+
+    return
+      new V301UpgradeProposal({
+        poolAddressesProvider: poolAddressesProvider,
+        pool: pool,
+        poolConfigurator: poolConfigurator,
+        collector: collector,
+        incentivesController: incentivesController,
+        newPoolImpl: poolImpl,
+        newPoolConfiguratorImpl: poolPoolConfiguratorImpl,
+        newProtocolDataProvider: protocolDataProvider,
+        newATokenImpl: aTokenImpl,
+        newVTokenImpl: vTokenImpl
+      });
+  }
+
+  function _deploy(
+    IPoolAddressesProvider poolAddressesProvider,
+    IPool pool,
+    IPoolConfigurator poolConfigurator,
+    address collector,
+    address incentivesController
+  ) public returns (V301UpgradeProposal) {
+    address poolImpl = _deployPoolImpl(poolAddressesProvider);
+    return
+      _deployProposal({
+        poolImpl: poolImpl,
+        poolAddressesProvider: poolAddressesProvider,
+        pool: pool,
+        poolConfigurator: poolConfigurator,
+        collector: collector,
+        incentivesController: incentivesController
+      });
+  }
+
+  function _deployL2(
+    IPoolAddressesProvider poolAddressesProvider,
+    IPool pool,
+    IPoolConfigurator poolConfigurator,
+    address collector,
+    address incentivesController
+  ) public returns (V301UpgradeProposal) {
+    address poolImpl = _deployL2PoolImpl(poolAddressesProvider);
+    return
+      _deployProposal({
+        poolImpl: poolImpl,
+        poolAddressesProvider: poolAddressesProvider,
+        pool: pool,
+        poolConfigurator: poolConfigurator,
+        collector: collector,
+        incentivesController: incentivesController
+      });
+  }
+
+  function deployPolygon() public returns (V301UpgradeProposal) {
+    return
+      _deploy({
+        poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Polygon.POOL,
+        poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
+        collector: AaveV3Polygon.COLLECTOR,
+        incentivesController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER
+      });
   }
 }
 
