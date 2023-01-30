@@ -1,7 +1,7 @@
+aave-address-book/=lib/aave-address-book/src/
+aave-helpers/=lib/aave-helpers/src/
 ds-test/=lib/forge-std/lib/ds-test/src/
-openzeppelin-contracts/=lib/openzeppelin-contracts/
 forge-std/=lib/forge-std/src/
+governance-crosschain-bridges/=lib/governance-crosschain-bridges/
 aave-v3-core/=lib/aave-v3-core/
 aave-v3-periphery/=lib/aave-v3-periphery/
-solidity-utils/=lib/solidity-utils/src/
-aave-address-book/=lib/aave-address-book/src/
