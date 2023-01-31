@@ -7,6 +7,8 @@ import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/
 import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/contracts/IERC20Detailed.sol';
 
 contract V301UpgradeProposal is IProposalGenericExecutor {
+  uint256 internal constant BORROWING_MASK =                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFFFFFFFFFFF; // prettier-ignore
+
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
@@ -86,6 +88,10 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
         });
 
       POOL_CONFIGURATOR.updateVariableDebtToken(inputVToken);
+
+      if ((reserveData.configuration.data & ~BORROWING_MASK) != 0) {
+        POOL_CONFIGURATOR.setReserveFlashLoaning(reserves[i], true);
+      }
     }
   }
 }
