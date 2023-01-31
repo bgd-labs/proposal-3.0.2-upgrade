@@ -88,6 +88,8 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
           params: '0x10' // this parameter is not actually used anywhere
         });
 
+      POOL_CONFIGURATOR.updateVariableDebtToken(inputVToken);
+
       IERC20Detailed sToken = IERC20Detailed(reserveData.stableDebtTokenAddress);
       ConfiguratorInputTypes.UpdateDebtTokenInput memory inputSToken = ConfiguratorInputTypes
         .UpdateDebtTokenInput({
@@ -99,7 +101,7 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
           params: '0x10' // this parameter is not actually used anywhere
         });
 
-      POOL_CONFIGURATOR.updateVariableDebtToken(inputVToken);
+      POOL_CONFIGURATOR.updateStableDebtToken(inputSToken);
 
       POOL_CONFIGURATOR.setReserveFlashLoaning(reserves[i], true);
     }
