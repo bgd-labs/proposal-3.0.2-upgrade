@@ -7,8 +7,6 @@ import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/
 import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/contracts/IERC20Detailed.sol';
 
 contract V301UpgradeProposal is IProposalGenericExecutor {
-  uint256 internal constant BORROWING_MASK =                 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFBFFFFFFFFFFFFFF; // prettier-ignore
-
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
@@ -20,6 +18,7 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
   address public immutable NEW_PROTOCOL_DATA_PROVIDER;
   address public immutable NEW_ATOKEN_IMPL;
   address public immutable NEW_VTOKEN_IMPL;
+  address public immutable NEW_STOKEN_IMPL;
 
   constructor(
     IPoolAddressesProvider poolAddressesProvider,
@@ -31,7 +30,8 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
     address newPoolConfiguratorImpl,
     address newProtocolDataProvider,
     address newATokenImpl,
-    address newVTokenImpl
+    address newVTokenImpl,
+    address newSTokenImpl
   ) {
     POOL_ADDRESSES_PROVIDER = poolAddressesProvider;
     POOL = pool;
@@ -44,6 +44,7 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
     NEW_PROTOCOL_DATA_PROVIDER = newProtocolDataProvider;
     NEW_ATOKEN_IMPL = newATokenImpl;
     NEW_VTOKEN_IMPL = newVTokenImpl;
+    NEW_STOKEN_IMPL = newSTokenImpl;
   }
 
   function execute() public {
@@ -84,6 +85,17 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
           name: vToken.name(),
           symbol: vToken.symbol(),
           implementation: NEW_VTOKEN_IMPL,
+          params: '0x10' // this parameter is not actually used anywhere
+        });
+
+      IERC20Detailed sToken = IERC20Detailed(reserveData.stableDebtTokenAddress);
+      ConfiguratorInputTypes.UpdateDebtTokenInput memory inputSToken = ConfiguratorInputTypes
+        .UpdateDebtTokenInput({
+          asset: reserves[i],
+          incentivesController: INCENTIVES_CONTROLLER,
+          name: sToken.name(),
+          symbol: sToken.symbol(),
+          implementation: NEW_STOKEN_IMPL,
           params: '0x10' // this parameter is not actually used anywhere
         });
 

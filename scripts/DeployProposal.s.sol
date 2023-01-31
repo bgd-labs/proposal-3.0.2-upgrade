@@ -12,6 +12,7 @@ import {AaveProtocolDataProvider} from 'aave-v3-core/contracts/misc/AaveProtocol
 import {IAaveIncentivesController} from 'aave-v3-core/contracts/interfaces/IAaveIncentivesController.sol';
 import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
+import {StableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol';
 
 import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
 
@@ -83,6 +84,22 @@ library DeployUpgrade {
     return address(variableDebtTokenImpl);
   }
 
+  function _deploySToken(IPool pool) internal returns (address) {
+    StableDebtToken stableDebtTokenImpl = new StableDebtToken(pool);
+    // follow empty initialization pattern like in previous deployments
+    // ref: https://etherscan.io/tx/0xb31ebf63d6814ebbf0c7647d59010dabf75f094dd798f148f31941b872bc0c93
+    stableDebtTokenImpl.initialize(
+      pool,
+      address(0),
+      IAaveIncentivesController(address(0)),
+      0,
+      'STABLE_DEBT_TOKEN_IMPL',
+      'STABLE_DEBT_TOKEN_IMPL',
+      '0x00'
+    );
+    return address(stableDebtTokenImpl);
+  }
+
   function _deployProposal(
     IPoolAddressesProvider poolAddressesProvider,
     IPool pool,
@@ -95,6 +112,7 @@ library DeployUpgrade {
     address protocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
     address aTokenImpl = _deployAToken(pool);
     address vTokenImpl = _deployVToken(pool);
+    address sTokenImpl = _deploySToken(pool);
 
     return
       new V301UpgradeProposal({
@@ -107,7 +125,8 @@ library DeployUpgrade {
         newPoolConfiguratorImpl: poolPoolConfiguratorImpl,
         newProtocolDataProvider: protocolDataProvider,
         newATokenImpl: aTokenImpl,
-        newVTokenImpl: vTokenImpl
+        newVTokenImpl: vTokenImpl,
+        newSTokenImpl: sTokenImpl
       });
   }
 
