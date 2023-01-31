@@ -89,9 +89,7 @@ contract V301UpgradeProposal is IProposalGenericExecutor {
 
       POOL_CONFIGURATOR.updateVariableDebtToken(inputVToken);
 
-      if ((reserveData.configuration.data & ~BORROWING_MASK) != 0) {
-        POOL_CONFIGURATOR.setReserveFlashLoaning(reserves[i], true);
-      }
+      POOL_CONFIGURATOR.setReserveFlashLoaning(reserves[i], true);
     }
   }
 }
