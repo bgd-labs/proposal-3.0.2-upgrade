@@ -46,7 +46,11 @@ const INVALID_KEYS = [
   "SWAP_COLLATERAL_ADAPTER", // utility
   "LISTING_ENGINE", // utility
   "ACL_ADMIN", // chain specific
-  "COLLECTOR", // done in different proposal
+  "COLLECTOR", // done in different proposal,
+  "COLLECTOR_CONTROLLER", // done in different proposal
+  "UI_INCENTIVE_DATA_PROVIDER", // utility
+  "UI_POOL_DATA_PROVIDER", // utility
+  "WALLET_BALANCE_PROVIDER", // utility
 ];
 
 const PROXIES = [
@@ -81,6 +85,11 @@ function diffContracts(chain, config) {
 }
 
 async function main() {
+  // manually add an IR for diffing
+  AaveV3Ethereum.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
+    "0x694d4cFdaeE639239df949b6E24Ff8576A00d1f2";
+  AaveV3Polygon.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
+    "0xA9F3C3caE095527061e6d270DBE163693e6fda9D";
   downloadContracts("mainnet", AaveV3Ethereum);
   downloadContracts("polygon", AaveV3Polygon);
   diffContracts("polygon", AaveV3Polygon);

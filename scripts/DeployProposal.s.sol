@@ -12,11 +12,16 @@ import {AaveProtocolDataProvider} from 'aave-v3-core/contracts/misc/AaveProtocol
 import {IAaveIncentivesController} from 'aave-v3-core/contracts/interfaces/IAaveIncentivesController.sol';
 import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
+import {StableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol';
 
 import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
 
-// temp
-import {AaveV3Polygon} from 'aave-address-book/AaveAddressBook.sol';
+import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
+import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
+import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
+import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
+import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 
 library DeployUpgrade {
   function _deployPoolImpl(
@@ -83,6 +88,22 @@ library DeployUpgrade {
     return address(variableDebtTokenImpl);
   }
 
+  function _deploySToken(IPool pool) internal returns (address) {
+    StableDebtToken stableDebtTokenImpl = new StableDebtToken(pool);
+    // follow empty initialization pattern like in previous deployments
+    // ref: https://etherscan.io/tx/0xb31ebf63d6814ebbf0c7647d59010dabf75f094dd798f148f31941b872bc0c93
+    stableDebtTokenImpl.initialize(
+      pool,
+      address(0),
+      IAaveIncentivesController(address(0)),
+      0,
+      'STABLE_DEBT_TOKEN_IMPL',
+      'STABLE_DEBT_TOKEN_IMPL',
+      '0x00'
+    );
+    return address(stableDebtTokenImpl);
+  }
+
   function _deployProposal(
     IPoolAddressesProvider poolAddressesProvider,
     IPool pool,
@@ -95,6 +116,7 @@ library DeployUpgrade {
     address protocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
     address aTokenImpl = _deployAToken(pool);
     address vTokenImpl = _deployVToken(pool);
+    address sTokenImpl = _deploySToken(pool);
 
     return
       new V301UpgradeProposal({
@@ -107,7 +129,8 @@ library DeployUpgrade {
         newPoolConfiguratorImpl: poolPoolConfiguratorImpl,
         newProtocolDataProvider: protocolDataProvider,
         newATokenImpl: aTokenImpl,
-        newVTokenImpl: vTokenImpl
+        newVTokenImpl: vTokenImpl,
+        newSTokenImpl: sTokenImpl
       });
   }
 
@@ -157,6 +180,61 @@ library DeployUpgrade {
         poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
         collector: AaveV3Polygon.COLLECTOR,
         incentivesController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER
+      });
+  }
+
+  function deployAvalanche() public returns (V301UpgradeProposal) {
+    return
+      _deploy({
+        poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Avalanche.POOL,
+        poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
+        collector: AaveV3Avalanche.COLLECTOR,
+        incentivesController: AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER
+      });
+  }
+
+  function deployFantom() public returns (V301UpgradeProposal) {
+    return
+      _deploy({
+        poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Fantom.POOL,
+        poolConfigurator: AaveV3Fantom.POOL_CONFIGURATOR,
+        collector: AaveV3Fantom.COLLECTOR,
+        incentivesController: AaveV3Fantom.DEFAULT_INCENTIVES_CONTROLLER
+      });
+  }
+
+  function deployHarmony() public returns (V301UpgradeProposal) {
+    return
+      _deploy({
+        poolAddressesProvider: AaveV3Harmony.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Harmony.POOL,
+        poolConfigurator: AaveV3Harmony.POOL_CONFIGURATOR,
+        collector: AaveV3Harmony.COLLECTOR,
+        incentivesController: AaveV3Harmony.DEFAULT_INCENTIVES_CONTROLLER
+      });
+  }
+
+  function deployOptimism() public returns (V301UpgradeProposal) {
+    return
+      _deployL2({
+        poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Optimism.POOL,
+        poolConfigurator: AaveV3Optimism.POOL_CONFIGURATOR,
+        collector: AaveV3Optimism.COLLECTOR,
+        incentivesController: AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER
+      });
+  }
+
+  function deployArbitrum() public returns (V301UpgradeProposal) {
+    return
+      _deployL2({
+        poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
+        pool: AaveV3Arbitrum.POOL,
+        poolConfigurator: AaveV3Arbitrum.POOL_CONFIGURATOR,
+        collector: AaveV3Arbitrum.COLLECTOR,
+        incentivesController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER
       });
   }
 }
