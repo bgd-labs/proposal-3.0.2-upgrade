@@ -84,6 +84,7 @@ function diffContracts(chain, config) {
 }
 
 async function main() {
+  // manually add an IR for diffing
   AaveV3Ethereum.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
     "0x694d4cFdaeE639239df949b6E24Ff8576A00d1f2";
   AaveV3Polygon.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
