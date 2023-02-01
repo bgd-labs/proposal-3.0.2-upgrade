@@ -6,11 +6,35 @@ This proposal contains a generic payload that can be used to upgrade an existing
 
 Therefore the proposal upgrades:
 
-- **AAVE_PROTOCOL_DATA_PROVIDER**: There are significant changes that are required for properly handling the newly introduced
+- **AAVE_PROTOCOL_DATA_PROVIDER**: There are relevant changes in regards to `flashloanable`
 
-Upgrades that were skipped as they seemed unnecessary:
+- **POOL_CONFIGURATOR**: There are relevant changes in regards to `flashloanable`
 
-- **ACL_MANAGER**:
+- **POOL**: There are relevant logic changes
+
+- **A_TOKEN_IMPL**: There are relevant changes in regards to events and libraries
+
+- **VARIABLE_DEBT_TOKEN_IMPL**: There are relevant changes in regards to events and libraries
+
+- **STABLE_DEBT_TOKEN_IMPL**: There are relevant changes in regards to events
+
+Upgrades that were skipped as they seem unnecessary:
+
+- **ACL_MANAGER**: only changes are in unused parts of libraries and documentation
+
+- **COLLECTOR/COLLECTOR_CONTROLLER**: are currently not tied to a protocol version and will be aligned in a different proposal
+
+- **RESERVE_INTEREST_RATE**: there are method visibility changes, which are irrelevant for existing reserves and we think it's reasonable to migrate over time organically
+
+- **EMISSION_CONTROLLER**: only changes are in documentation
+
+- **ORACLE**: only changes are in unused parts of libraries and documentation
+
+- **POOL_ADDRESS_PROVIDER_REGISTRY**: only changes are in unused parts of libraries and documentation
+
+- **WETH_GATEWAY**: only changes are in unused parts of libraries and documentation
+
+In addition to the upgrade, the newly introduced `flashloanable` flag is set to `true` for all assets.
 
 ## Scripts
 
