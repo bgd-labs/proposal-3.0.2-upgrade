@@ -1,10 +1,5 @@
 # Aave 3.0.1 upgrade proposal
 
-## TODO:
-
-- [ ] double check that the branch of aave v3 core is based on correct head
-- [ ] adjust for L2Pool
-
 ## Development
 
 This project uses [Foundry](https://getfoundry.sh). See the [book](https://book.getfoundry.sh/getting-started/installation.html) for detailed instructions on how to install and use Foundry.
@@ -23,19 +18,6 @@ forge install
 forge test
 ```
 
-## Advanced features
+## Scripts
 
-### Diffing
-
-For contracts upgrading implementations it's quite important to diff the implementation code to spot potential issues and ensure only the intended changes are included.
-Therefore the `Makefile` includes some commands to streamline the diffing process.
-
-#### Download
-
-You can `download` the current contract code of a deployed contract via `make download chain=polygon address=0x00`. This will download the contract source for specified address to `src/etherscan/chain_address`. This command works for all chains with a etherscan compatible block explorer.
-
-#### Git diff
-
-You can `git-diff` a downloaded contract against your src via `make git-diff before=./etherscan/chain_address after=./src out=filename`. This command will diff the two folders via git patience algorithm and write the output to `diffs/filename.md`.
-
-**Caveat**: If the onchain implementation was verified using flatten, for generating the diff you need to flatten the new contract via `forge flatten` and supply the flattened file instead fo the whole `./src` folder.
+To identify differences between the deploy `3.0.0` and the new `3.0.1` version of the aave protocol the `diff.js` utility generates a code diff between `AaveV3Ethereum` and `AaveV3Polygon`.
