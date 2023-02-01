@@ -84,6 +84,10 @@ function diffContracts(chain, config) {
 }
 
 async function main() {
+  AaveV3Ethereum.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
+    "0x694d4cFdaeE639239df949b6E24Ff8576A00d1f2";
+  AaveV3Polygon.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
+    "0xA9F3C3caE095527061e6d270DBE163693e6fda9D";
   downloadContracts("mainnet", AaveV3Ethereum);
   downloadContracts("polygon", AaveV3Polygon);
   diffContracts("polygon", AaveV3Polygon);
