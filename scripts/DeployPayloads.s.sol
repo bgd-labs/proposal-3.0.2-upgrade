@@ -23,7 +23,7 @@ import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 
-library DeployUpgrade {
+library DeployPayloads {
   function _deployPoolImpl(
     IPoolAddressesProvider poolAddressesProvider
   ) internal returns (address) {
@@ -239,9 +239,56 @@ library DeployUpgrade {
   }
 }
 
-contract Deploy is Script {
+contract DeployPolygon is Script {
   function run() external {
+    require(block.chainid == 137, 'POLYGON_ONLY');
     vm.startBroadcast();
+    DeployPayloads.deployPolygon();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployOptimism is Script {
+  function run() external {
+    require(block.chainid == 10, 'OPTIMISM_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployOptimism();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployArbitrum is Script {
+  function run() external {
+    require(block.chainid == 42161, 'ARBITRUM_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployArbitrum();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployAvalanche is Script {
+  function run() external {
+    require(block.chainid == 43114, 'AVALANCHE_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployAvalanche();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployFantom is Script {
+  function run() external {
+    require(block.chainid == 250, 'FANTOM_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployFantom();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployHarmony is Script {
+  function run() external {
+    require(block.chainid == 1666600000, 'HARMONY_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployHarmony();
     vm.stopBroadcast();
   }
 }

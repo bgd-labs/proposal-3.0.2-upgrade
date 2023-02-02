@@ -6,7 +6,7 @@ import {ProtocolV3TestBase, ProtocolV3_0_1TestBase} from 'aave-helpers/ProtocolV
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Polygon, AaveV3Avalanche, AaveV3Optimism, AaveV3Arbitrum, AaveV3Harmony, AaveV3Fantom} from 'aave-address-book/AaveAddressBook.sol';
 
-import {DeployUpgrade} from '../scripts/DeployProposal.s.sol';
+import {DeployPayloads} from '../scripts/DeployPayloads.s.sol';
 import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
 
 library ForkBlocks {
@@ -61,7 +61,7 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
     vm.createSelectFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
     _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR); // admin is the guardian
 
-    proposalPayload = DeployUpgrade.deployPolygon();
+    proposalPayload = DeployPayloads.deployPolygon();
   }
 
   function testProposal() public {
@@ -81,7 +81,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
     vm.createSelectFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
     _selectPayloadExecutor(AaveV3Avalanche.ACL_ADMIN);
 
-    proposalPayload = DeployUpgrade.deployAvalanche();
+    proposalPayload = DeployPayloads.deployAvalanche();
   }
 
   function testProposal() public {
@@ -101,7 +101,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
     vm.createSelectFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
     _selectPayloadExecutor(AaveV3Optimism.ACL_ADMIN); // guardian is still owner of addresses provider
 
-    proposalPayload = DeployUpgrade.deployOptimism();
+    proposalPayload = DeployPayloads.deployOptimism();
   }
 
   function testProposal() public {
@@ -121,7 +121,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
     vm.createSelectFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
     _selectPayloadExecutor(AaveV3Arbitrum.ACL_ADMIN); // guardian is still owner of addresses provider
 
-    proposalPayload = DeployUpgrade.deployArbitrum();
+    proposalPayload = DeployPayloads.deployArbitrum();
   }
 
   function testProposal() public {
@@ -141,7 +141,7 @@ contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
     vm.createSelectFork(vm.rpcUrl('harmony'), ForkBlocks.HARMONY);
     _selectPayloadExecutor(AaveV3Harmony.ACL_ADMIN); // guardian is still owner of addresses provider
 
-    proposalPayload = DeployUpgrade.deployHarmony();
+    proposalPayload = DeployPayloads.deployHarmony();
   }
 
   function testProposal() public {
@@ -161,7 +161,7 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
     vm.createSelectFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
     _selectPayloadExecutor(AaveV3Fantom.ACL_ADMIN); // guardian is still owner of addresses provider
 
-    proposalPayload = DeployUpgrade.deployFantom();
+    proposalPayload = DeployPayloads.deployFantom();
   }
 
   function testProposal() public {
