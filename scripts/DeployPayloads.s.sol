@@ -14,7 +14,7 @@ import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
 import {StableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol';
 
-import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
+import {V301UpgradePayload} from '../src/contracts/V301UpgradePayload.sol';
 
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
@@ -111,7 +111,7 @@ library DeployPayloads {
     address collector,
     address incentivesController,
     address poolImpl
-  ) internal returns (V301UpgradeProposal) {
+  ) internal returns (V301UpgradePayload) {
     address poolPoolConfiguratorImpl = _deployPoolConfiguratorImpl(poolAddressesProvider);
     address protocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
     address aTokenImpl = _deployAToken(pool);
@@ -119,7 +119,7 @@ library DeployPayloads {
     address sTokenImpl = _deploySToken(pool);
 
     return
-      new V301UpgradeProposal({
+      new V301UpgradePayload({
         poolAddressesProvider: poolAddressesProvider,
         pool: pool,
         poolConfigurator: poolConfigurator,
@@ -140,7 +140,7 @@ library DeployPayloads {
     IPoolConfigurator poolConfigurator,
     address collector,
     address incentivesController
-  ) public returns (V301UpgradeProposal) {
+  ) public returns (V301UpgradePayload) {
     address poolImpl = _deployPoolImpl(poolAddressesProvider);
     return
       _deployProposal({
@@ -159,7 +159,7 @@ library DeployPayloads {
     IPoolConfigurator poolConfigurator,
     address collector,
     address incentivesController
-  ) public returns (V301UpgradeProposal) {
+  ) public returns (V301UpgradePayload) {
     address poolImpl = _deployL2PoolImpl(poolAddressesProvider);
     return
       _deployProposal({
@@ -172,7 +172,7 @@ library DeployPayloads {
       });
   }
 
-  function deployPolygon() public returns (V301UpgradeProposal) {
+  function deployPolygon() public returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
@@ -183,7 +183,7 @@ library DeployPayloads {
       });
   }
 
-  function deployAvalanche() public returns (V301UpgradeProposal) {
+  function deployAvalanche() public returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
@@ -194,7 +194,7 @@ library DeployPayloads {
       });
   }
 
-  function deployFantom() public returns (V301UpgradeProposal) {
+  function deployFantom() public returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
@@ -205,7 +205,7 @@ library DeployPayloads {
       });
   }
 
-  function deployHarmony() public returns (V301UpgradeProposal) {
+  function deployHarmony() public returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Harmony.POOL_ADDRESSES_PROVIDER,
@@ -216,7 +216,7 @@ library DeployPayloads {
       });
   }
 
-  function deployOptimism() public returns (V301UpgradeProposal) {
+  function deployOptimism() public returns (V301UpgradePayload) {
     return
       _deployL2({
         poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
@@ -227,7 +227,7 @@ library DeployPayloads {
       });
   }
 
-  function deployArbitrum() public returns (V301UpgradeProposal) {
+  function deployArbitrum() public returns (V301UpgradePayload) {
     return
       _deployL2({
         poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,

@@ -7,7 +7,7 @@ import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Polygon, AaveV3Avalanche, AaveV3Optimism, AaveV3Arbitrum, AaveV3Harmony, AaveV3Fantom} from 'aave-address-book/AaveAddressBook.sol';
 
 import {DeployPayloads} from '../scripts/DeployPayloads.s.sol';
-import {V301UpgradeProposal} from '../src/contracts/V301UpgradeProposal.sol';
+import {V301UpgradePayload} from '../src/contracts/V301UpgradePayload.sol';
 
 library ForkBlocks {
   uint256 constant POLYGON = 38552998;
@@ -22,8 +22,6 @@ library ForkBlocks {
  * Just generating snapshots via ProtocolV3TestBase so we can compare with ProtocolV3_0_1TestBase
  */
 contract V301UpgradePreProposalSnapshot is ProtocolV3TestBase {
-  V301UpgradeProposal public proposalPayload;
-
   uint256 polygonFork;
   uint256 avalancheFork;
   uint256 optimismFork;
@@ -55,7 +53,7 @@ contract V301UpgradePreProposalSnapshot is ProtocolV3TestBase {
 }
 
 contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
@@ -75,7 +73,7 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 }
 
 contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
@@ -95,7 +93,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
 }
 
 contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
@@ -115,7 +113,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 }
 
 contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
@@ -135,7 +133,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 }
 
 contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('harmony'), ForkBlocks.HARMONY);
@@ -155,7 +153,7 @@ contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 }
 
 contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301UpgradeProposal public proposalPayload;
+  V301UpgradePayload public proposalPayload;
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
@@ -172,4 +170,15 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
     // address user = address(42);
     // e2eTest(AaveV3Arbitrum.POOL, user);
   }
+
+  // function testFfi() public {
+  //   string[] memory inputs = new string[](4);
+  //   inputs[0] = 'make';
+  //   inputs[1] = 'git-diff';
+  //   inputs[2] = abi.encodePacked('before=');
+  //   inputs[3] = 'after=';
+  //   inputs[4] = 'out=';
+
+  //   vm.ffi(inputs);
+  // }
 }
