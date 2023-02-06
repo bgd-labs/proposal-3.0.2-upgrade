@@ -19,38 +19,41 @@ library ForkBlocks {
 }
 
 /**
+ * @dev commented out as only used to create initial snapshot to compare against.
  * Just generating snapshots via ProtocolV3TestBase so we can compare with ProtocolV3_0_1TestBase
  */
-contract V301UpgradePreProposalSnapshot is ProtocolV3TestBase {
-  uint256 polygonFork;
-  uint256 avalancheFork;
-  uint256 optimismFork;
-  uint256 arbitrumFork;
-  uint256 harmonyFork;
-  uint256 fantomFork;
+// contract V301UpgradePreProposalSnapshot is ProtocolV3TestBase {
+//   uint256 polygonFork;
+//   uint256 avalancheFork;
+//   uint256 optimismFork;
+//   uint256 arbitrumFork;
+//   uint256 harmonyFork;
+//   uint256 fantomFork;
 
-  function setUp() public {
-    polygonFork = vm.createFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
-    avalancheFork = vm.createFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
-    optimismFork = vm.createFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
-    arbitrumFork = vm.createFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
-    harmonyFork = vm.createFork(vm.rpcUrl('harmony'), ForkBlocks.HARMONY);
-    fantomFork = vm.createFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
-  }
+//   function setUp() public {
+//     polygonFork = vm.createFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
+//     avalancheFork = vm.createFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
+//     optimismFork = vm.createFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
+//     arbitrumFork = vm.createFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
+//     harmonyFork = vm.createFork(vm.rpcUrl('harmony'), ForkBlocks.HARMONY);
+//     fantomFork = vm.createFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
+//   }
 
-  function testCreateSnapshot() public {
-    vm.selectFork(polygonFork);
-    createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Polygon.POOL);
-    vm.selectFork(avalancheFork);
-    createConfigurationSnapshot('pre-upgrade-avalanche', AaveV3Avalanche.POOL);
-    vm.selectFork(optimismFork);
-    createConfigurationSnapshot('pre-upgrade-optimism', AaveV3Optimism.POOL);
-    vm.selectFork(harmonyFork);
-    createConfigurationSnapshot('pre-upgrade-harmony', AaveV3Harmony.POOL);
-    vm.selectFork(fantomFork);
-    createConfigurationSnapshot('pre-upgrade-fantom', AaveV3Fantom.POOL);
-  }
-}
+//   function testCreateSnapshot() public {
+//     vm.selectFork(polygonFork);
+//     createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Polygon.POOL);
+//     vm.selectFork(avalancheFork);
+//     createConfigurationSnapshot('pre-upgrade-avalanche', AaveV3Avalanche.POOL);
+//     vm.selectFork(optimismFork);
+//     createConfigurationSnapshot('pre-upgrade-optimism', AaveV3Optimism.POOL);
+//     vm.selectFork(arbitrumFork);
+//     createConfigurationSnapshot('pre-upgrade-arbitrum', AaveV3Arbitrum.POOL);
+//     vm.selectFork(harmonyFork);
+//     createConfigurationSnapshot('pre-upgrade-harmony', AaveV3Harmony.POOL);
+//     vm.selectFork(fantomFork);
+//     createConfigurationSnapshot('pre-upgrade-fantom', AaveV3Fantom.POOL);
+//   }
+// }
 
 contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
   V301UpgradePayload public proposalPayload;
@@ -65,6 +68,7 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-polygon', AaveV3Avalanche.POOL);
+    diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
 
     // error due to supply cap - tests need improvement
     // address user = address(42);
@@ -85,6 +89,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-avalanche', AaveV3Avalanche.POOL);
+    diffReports('pre-upgrade-avalanche', 'post-upgrade-avalanche');
 
     // error due to supply cap - tests need improvement
     // address user = address(42);
@@ -105,6 +110,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-optimism', AaveV3Optimism.POOL);
+    diffReports('pre-upgrade-optimism', 'post-upgrade-optimism');
 
     // error due to [FAIL. Reason: stdStorage find(StdStorage): Packed slot. This would cause dangerous overwriting and currently isn't supported.] - not sure what it means
     // address user = address(42);
@@ -125,6 +131,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-arbitrum', AaveV3Arbitrum.POOL);
+    diffReports('pre-upgrade-arbitrum', 'post-upgrade-arbitrum');
 
     // error due to supply cap - tests need improvement
     // address user = address(42);
@@ -145,6 +152,7 @@ contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-harmony', AaveV3Harmony.POOL);
+    diffReports('pre-upgrade-harmony', 'post-upgrade-harmony');
 
     // error due to supply cap - tests need improvement
     // address user = address(42);
@@ -165,20 +173,10 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
   function testProposal() public {
     _executePayload(address(proposalPayload));
     createConfigurationSnapshot('post-upgrade-fantom', AaveV3Fantom.POOL);
+    diffReports('pre-upgrade-fantom', 'post-upgrade-fantom');
 
     // error due to supply cap - tests need improvement
     // address user = address(42);
     // e2eTest(AaveV3Arbitrum.POOL, user);
   }
-
-  // function testFfi() public {
-  //   string[] memory inputs = new string[](4);
-  //   inputs[0] = 'make';
-  //   inputs[1] = 'git-diff';
-  //   inputs[2] = abi.encodePacked('before=');
-  //   inputs[3] = 'after=';
-  //   inputs[4] = 'out=';
-
-  //   vm.ffi(inputs);
-  // }
 }

@@ -11,6 +11,7 @@ test   :; forge test -vvv
 
 # Utilities
 download :; cast etherscan-source --chain ${chain} -d src/etherscan/${chain}_${address} ${address}
+storage-layout :; forge inspect ${contract} storage-layout --pretty > reports/${name}_layout.md
 git-diff :
 	@mkdir -p diffs
 	@printf '%s\n%s\n%s\n' "\`\`\`diff" "$$(git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ${before} ${after})" "\`\`\`" > diffs/${out}.md
