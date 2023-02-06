@@ -41,9 +41,9 @@ storage-diff :
 	forge inspect downloads/polygon/DEFAULT_A_TOKEN_IMPL_REV_1/AToken/@aave/core-v3/contracts/protocol/tokenization/AToken.sol:AToken storage-layout --pretty > reports/AToken_layout.md
 	forge inspect downloads/polygon/DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1/VariableDebtToken/@aave/core-v3/contracts/protocol/tokenization/VariableDebtToken.sol:VariableDebtToken storage-layout --pretty > reports/VariableDebtToken_layout.md
 	forge inspect downloads/polygon/DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1/StableDebtToken/@aave/core-v3/contracts/protocol/tokenization/StableDebtToken.sol:StableDebtToken storage-layout --pretty > reports/StableDebtToken_layout.md
-	make git-diff before=reports/Pool_layout.md after=reports/Pool_v301_layout.md out=Pool_layout_diff.md
-	make git-diff before=reports/L2Pool_layout.md after=reports/L2Pool_v301_layout.md out=L2Pool_layout_diff.md
-	make git-diff before=reports/PoolConfigurator_layout.md after=reports/PoolConfigurator_v301_layout.md out=PoolConfigurator_layout_diff.md
-	make git-diff before=reports/AToken_layout.md after=reports/AToken_v301_layout.md out=AToken_layout_diff.md
-	make git-diff before=reports/VariableDebtToken_layout.md after=reports/VariableDebtToken_v301_layout.md out=VariableDebtToken_layout_diff.md
-	make git-diff before=reports/StableDebtToken_layout.md after=reports/StableDebtToken_v301_layout.md out=StableDebtToken_layout_diff.md
+	make git-diff before=reports/Pool_layout.md after=reports/Pool_v301_layout.md out=Pool_layout_diff
+	make git-diff before=reports/L2Pool_layout.md after=reports/L2Pool_v301_layout.md out=L2Pool_layout_diff
+	make git-diff before=reports/PoolConfigurator_layout.md after=reports/PoolConfigurator_v301_layout.md out=PoolConfigurator_layout_diff
+	make git-diff before=reports/AToken_layout.md after=reports/AToken_v301_layout.md out=AToken_layout_diff
+	make git-diff before=reports/VariableDebtToken_layout.md after=reports/VariableDebtToken_v301_layout.md out=VariableDebtToken_layout_diff
+	make git-diff before=reports/StableDebtToken_layout.md after=reports/StableDebtToken_v301_layout.md out=StableDebtToken_layout_diff
