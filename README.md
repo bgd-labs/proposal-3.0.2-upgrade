@@ -73,7 +73,8 @@ Therefore we took all relevant addresses from `AaveAddressBook` downloaded their
 
 ### Storage layout
 
-To be done
+To ensure storage compatibility between new and old implementations we created storage layout snapshots for v3 and v3.0.1 contracts and diffed them.
+You can find the snapshots in the [reports](./reports/) directory and a diff for all the storage-layouts within the [diffs](./diffs/) folder.
 
 ### E2E tests
 

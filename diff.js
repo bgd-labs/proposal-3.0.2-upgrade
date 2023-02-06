@@ -6,6 +6,7 @@ const { utils } = require("ethers");
 const {
   AaveV3Ethereum,
   AaveV3Polygon,
+  AaveV3Optimism,
 } = require("@bgd-labs/aave-address-book");
 
 function runCmd(cmd) {
@@ -93,6 +94,11 @@ async function main() {
   downloadContracts("mainnet", AaveV3Ethereum);
   downloadContracts("polygon", AaveV3Polygon);
   diffContracts("polygon", AaveV3Polygon);
+  download(
+    "optimism",
+    "L2_POOL_IMPL",
+    getImpl("optimism", AaveV3Optimism.POOL)
+  );
 }
 
 main();
