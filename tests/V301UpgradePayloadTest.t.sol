@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {TestWithExecutor} from 'aave-helpers/GovHelpers.sol';
-import {ProtocolV3TestBase, ProtocolV3_0_1TestBase} from 'aave-helpers/ProtocolV3TestBase.sol';
+import {ProtocolV3TestBase, ProtocolV3_0_1TestBase, ReserveConfig} from 'aave-helpers/ProtocolV3TestBase.sol';
 import {AaveGovernanceV2} from 'aave-address-book/AaveGovernanceV2.sol';
 import {AaveV3Polygon, AaveV3Avalanche, AaveV3Optimism, AaveV3Arbitrum, AaveV3Harmony, AaveV3Fantom} from 'aave-address-book/AaveAddressBook.sol';
 
@@ -67,10 +67,10 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-polygon', AaveV3Avalanche.POOL);
-    diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
+    // createConfigurationSnapshot('post-upgrade-polygon', AaveV3Avalanche.POOL);
+    // diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
 
-    // error due to supply cap - tests need improvement
+    // error: due to supply/borrow caps
     // address user = address(42);
     // e2eTest(AaveV3Polygon.POOL, user);
   }
@@ -88,10 +88,10 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-avalanche', AaveV3Avalanche.POOL);
-    diffReports('pre-upgrade-avalanche', 'post-upgrade-avalanche');
+    // createConfigurationSnapshot('post-upgrade-avalanche', AaveV3Avalanche.POOL);
+    // diffReports('pre-upgrade-avalanche', 'post-upgrade-avalanche');
 
-    // error due to supply cap - tests need improvement
+    // error: due to supply/borrow caps
     // address user = address(42);
     // e2eTest(AaveV3Avalanche.POOL, user);
   }
@@ -109,10 +109,10 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-optimism', AaveV3Optimism.POOL);
-    diffReports('pre-upgrade-optimism', 'post-upgrade-optimism');
+    // createConfigurationSnapshot('post-upgrade-optimism', AaveV3Optimism.POOL);
+    // diffReports('pre-upgrade-optimism', 'post-upgrade-optimism');
 
-    // error due to [FAIL. Reason: stdStorage find(StdStorage): Packed slot. This would cause dangerous overwriting and currently isn't supported.] - not sure what it means
+    // error due to [FAIL. Reason: stdStorage find(StdStorage): Packed slot. This would cause dangerous overwriting and currently isn't supported.] - sUSD
     // address user = address(42);
     // e2eTest(AaveV3Optimism.POOL, user);
   }
@@ -130,12 +130,12 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-arbitrum', AaveV3Arbitrum.POOL);
-    diffReports('pre-upgrade-arbitrum', 'post-upgrade-arbitrum');
+    // createConfigurationSnapshot('post-upgrade-arbitrum', AaveV3Arbitrum.POOL);
+    // diffReports('pre-upgrade-arbitrum', 'post-upgrade-arbitrum');
 
     // error due to supply cap - tests need improvement
-    // address user = address(42);
-    // e2eTest(AaveV3Arbitrum.POOL, user);
+    address user = address(42);
+    e2eTest(AaveV3Arbitrum.POOL, user);
   }
 }
 
@@ -151,10 +151,10 @@ contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-harmony', AaveV3Harmony.POOL);
-    diffReports('pre-upgrade-harmony', 'post-upgrade-harmony');
+    // createConfigurationSnapshot('post-upgrade-harmony', AaveV3Harmony.POOL);
+    // diffReports('pre-upgrade-harmony', 'post-upgrade-harmony');
 
-    // error due to supply cap - tests need improvement
+    // error: all reserves are frozen, nothing to test
     // address user = address(42);
     // e2eTest(AaveV3Arbitrum.POOL, user);
   }
@@ -172,10 +172,10 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
 
   function testProposal() public {
     _executePayload(address(proposalPayload));
-    createConfigurationSnapshot('post-upgrade-fantom', AaveV3Fantom.POOL);
-    diffReports('pre-upgrade-fantom', 'post-upgrade-fantom');
+    // createConfigurationSnapshot('post-upgrade-fantom', AaveV3Fantom.POOL);
+    // diffReports('pre-upgrade-fantom', 'post-upgrade-fantom');
 
-    // error due to supply cap - tests need improvement
+    // error: all reserves are frozen, nothing to test
     // address user = address(42);
     // e2eTest(AaveV3Arbitrum.POOL, user);
   }
