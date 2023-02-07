@@ -32,6 +32,8 @@ Therefore the proposal upgrades:
 
 - **AAVE_PROTOCOL_DATA_PROVIDER**: There are relevant changes in regards to `flashloanable`
 
+  - [CODE DIFF](./diffs/)
+
 - **POOL_CONFIGURATOR**: There are relevant changes in regards to `flashloanable`
 
 - **POOL**: There are relevant logic changes

@@ -68,7 +68,7 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-polygon', AaveV3Avalanche.POOL);
-    // diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
+    diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
 
     // error: due to supply/borrow caps
     // address user = address(42);
@@ -89,7 +89,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-avalanche', AaveV3Avalanche.POOL);
-    // diffReports('pre-upgrade-avalanche', 'post-upgrade-avalanche');
+    diffReports('pre-upgrade-avalanche', 'post-upgrade-avalanche');
 
     // error: due to supply/borrow caps
     // address user = address(42);
@@ -110,7 +110,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-optimism', AaveV3Optimism.POOL);
-    // diffReports('pre-upgrade-optimism', 'post-upgrade-optimism');
+    diffReports('pre-upgrade-optimism', 'post-upgrade-optimism');
 
     // error due to [FAIL. Reason: stdStorage find(StdStorage): Packed slot. This would cause dangerous overwriting and currently isn't supported.] - sUSD
     // address user = address(42);
@@ -131,7 +131,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-arbitrum', AaveV3Arbitrum.POOL);
-    // diffReports('pre-upgrade-arbitrum', 'post-upgrade-arbitrum');
+    diffReports('pre-upgrade-arbitrum', 'post-upgrade-arbitrum');
 
     // error due to supply cap - tests need improvement
     address user = address(42);
@@ -152,7 +152,7 @@ contract V301UpgradeHarmonyProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-harmony', AaveV3Harmony.POOL);
-    // diffReports('pre-upgrade-harmony', 'post-upgrade-harmony');
+    diffReports('pre-upgrade-harmony', 'post-upgrade-harmony');
 
     // error: all reserves are frozen, nothing to test
     // address user = address(42);
@@ -173,7 +173,7 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
   function testProposal() public {
     _executePayload(address(proposalPayload));
     // createConfigurationSnapshot('post-upgrade-fantom', AaveV3Fantom.POOL);
-    // diffReports('pre-upgrade-fantom', 'post-upgrade-fantom');
+    diffReports('pre-upgrade-fantom', 'post-upgrade-fantom');
 
     // error: all reserves are frozen, nothing to test
     // address user = address(42);
