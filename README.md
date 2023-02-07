@@ -32,33 +32,61 @@ Therefore the proposal upgrades:
 
 - **AAVE_PROTOCOL_DATA_PROVIDER**: There are relevant changes in regards to `flashloanable`
 
-  - [CODE DIFF](./diffs/)
+  - [CODE DIFF](./diffs/AAVE_PROTOCOL_DATA_PROVIDER_diff.md)
+  - Storage diff is irrelevant as it's not a proxy
 
 - **POOL_CONFIGURATOR**: There are relevant changes in regards to `flashloanable`
 
+  - [CODE DIFF](./diffs/POOL_CONFIGURATOR_IMPL_diff.md)
+  - [STORAGE DIFF](./diffs/PoolConfigurator_layout_diff.md)
+
 - **POOL**: There are relevant logic changes
+
+  - [CODE DIFF](./diffs/POOL_IMPL_diff.md)
+  - [STORAGE DIFF](./diffs/Pool_layout_diff.md)
 
 - **A_TOKEN_IMPL**: There are relevant changes in regards to events and libraries
 
+  - [CODE DIFF](./diffs/DEFAULT_A_TOKEN_IMPL_diff.md)
+  - [STORAGE DIFF](./diffs/AToken_layout_diff.md)
+
 - **VARIABLE_DEBT_TOKEN_IMPL**: There are relevant changes in regards to events and libraries
 
+  - [CODE DIFF](./diffs/DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1_diff.md)
+  - [STORAGE DIFF](./diffs/VariableDebtToken_layout_diff.md)
+
 - **STABLE_DEBT_TOKEN_IMPL**: There are relevant changes in regards to events
+
+  - [CODE DIFF](./diffs/DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1_diff.md)
+  - [STORAGE DIFF](./diffs/StableDebtToken_layout_diff.md)
 
 Upgrades that were skipped as they seem unnecessary:
 
 - **ACL_MANAGER**: only changes are in unused parts of libraries and documentation
 
+  - [CODE DIFF](./diffs/ACL_MANAGER_diff.md)
+
 - **COLLECTOR/COLLECTOR_CONTROLLER**: are currently not tied to a protocol version and will be aligned in a different proposal
 
 - **RESERVE_INTEREST_RATE**: there are method visibility changes, which are irrelevant for existing reserves and we think it's reasonable to migrate over time organically
 
+  - [CODE DIFF](./diffs/DEFAULT_RESERVE_INTEREST_RATE_STRATEGY_diff.md)
+
 - **EMISSION_CONTROLLER**: only changes are in documentation
+
+  - [CODE DIFF](./diffs/EMISSION_MANAGER_diff.md)
 
 - **ORACLE**: only changes are in unused parts of libraries and documentation
 
+  - [CODE DIFF](./diffs/ORACLE_diff.md)
+
 - **POOL_ADDRESS_PROVIDER_REGISTRY**: only changes are in unused parts of libraries and documentation
 
+  - [CODE DIFF](./diffs/POOL_ADDRESSES_PROVIDER_diff.md)
+
 - **WETH_GATEWAY**: only changes are in unused parts of libraries and documentation
+
+  - [CODE DIFF](./diffs/WETH_GATEWAY_diff.md)
 
 ## Scripts
 
@@ -73,6 +101,15 @@ Therefore we took all relevant addresses from `AaveAddressBook` downloaded their
 2. Simulated the proposal execution on a fork & generated a new configuration snapshot.
 3. Diffed them to ensure only the desired parts have changed.
 
+Snapshots:
+
+- [Polygon](./diffs/pre-upgrade-polygon_post-upgrade-polygon.md)
+- [Avalanche](./diffs/pre-upgrade-avalanche_post-upgrade-avalanche.md)
+- [Optimism](./diffs/pre-upgrade-optimism_post-upgrade-optimism.md)
+- [Arbitrum](./diffs/pre-upgrade-arbitrum_post-upgrade-arbitrum.md)
+- [Fantom](./diffs/pre-upgrade-fantom_post-upgrade-fantom.md)
+- [Harmony](./diffs/pre-upgrade-harmony_post-upgrade-harmony.md)
+
 ### Storage layout
 
 To ensure storage compatibility between new and old implementations we created storage layout snapshots for v3 and v3.0.1 contracts and diffed them.
@@ -80,7 +117,7 @@ You can find the snapshots in the [reports](./reports/) directory and a diff for
 
 ### E2E tests
 
-We simulated the proposal execution and afterwards ran our E2E test suite, covering supply, withdraw and borrow of all listed assets on a respective pool.
+We simulated the proposal execution and afterwards ran our E2E test suite, covering supply, withdraw and borrow of all listed assets on a respective pool(excluding fantom & harmony as all assets are frozen on these networks).
 
 ## Development
 

@@ -80,7 +80,7 @@ function diffContracts(chain, config) {
     .map((key) => {
       const identifier = PROXIES.includes(key) ? `${key}_IMPL` : key;
       runCmd(
-        `make git-diff before=downloads/${chain}/${identifier} after=downloads/mainnet/${identifier} out=${chain}_${identifier}`
+        `make git-diff before=downloads/${chain}/${identifier} after=downloads/mainnet/${identifier} out=${identifier}_diff`
       );
     });
 }
