@@ -6,7 +6,7 @@ import {IProposalGenericExecutor} from 'aave-helpers/interfaces/IProposalGeneric
 import {ConfiguratorInputTypes} from 'aave-v3-core/contracts/protocol/libraries/types/ConfiguratorInputTypes.sol';
 import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/contracts/IERC20Detailed.sol';
 
-contract V301UpgradeProposal is IProposalGenericExecutor {
+contract V301UpgradePayload is IProposalGenericExecutor {
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
   IPool public immutable POOL;
   IPoolConfigurator public immutable POOL_CONFIGURATOR;
