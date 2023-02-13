@@ -140,7 +140,7 @@ library DeployPayloads {
     IPoolConfigurator poolConfigurator,
     address collector,
     address incentivesController
-  ) public returns (V301UpgradePayload) {
+  ) internal returns (V301UpgradePayload) {
     address poolImpl = _deployPoolImpl(poolAddressesProvider);
     return
       _deployProposal({
@@ -159,7 +159,7 @@ library DeployPayloads {
     IPoolConfigurator poolConfigurator,
     address collector,
     address incentivesController
-  ) public returns (V301UpgradePayload) {
+  ) internal returns (V301UpgradePayload) {
     address poolImpl = _deployL2PoolImpl(poolAddressesProvider);
     return
       _deployProposal({
@@ -172,7 +172,7 @@ library DeployPayloads {
       });
   }
 
-  function deployPolygon() public returns (V301UpgradePayload) {
+  function deployPolygon() internal returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
@@ -183,7 +183,7 @@ library DeployPayloads {
       });
   }
 
-  function deployAvalanche() public returns (V301UpgradePayload) {
+  function deployAvalanche() internal returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
@@ -194,7 +194,7 @@ library DeployPayloads {
       });
   }
 
-  function deployFantom() public returns (V301UpgradePayload) {
+  function deployFantom() internal returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
@@ -205,7 +205,7 @@ library DeployPayloads {
       });
   }
 
-  function deployHarmony() public returns (V301UpgradePayload) {
+  function deployHarmony() internal returns (V301UpgradePayload) {
     return
       _deploy({
         poolAddressesProvider: AaveV3Harmony.POOL_ADDRESSES_PROVIDER,
@@ -216,7 +216,7 @@ library DeployPayloads {
       });
   }
 
-  function deployOptimism() public returns (V301UpgradePayload) {
+  function deployOptimism() internal returns (V301UpgradePayload) {
     return
       _deployL2({
         poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
@@ -227,7 +227,7 @@ library DeployPayloads {
       });
   }
 
-  function deployArbitrum() public returns (V301UpgradePayload) {
+  function deployArbitrum() internal returns (V301UpgradePayload) {
     return
       _deployL2({
         poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
