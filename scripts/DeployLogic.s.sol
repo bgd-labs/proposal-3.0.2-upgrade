@@ -18,26 +18,5 @@ import {LiquidationLogic} from 'aave-v3-core/contracts/protocol/libraries/logic/
 
 /**
  * These scrips are needed to workaround: https://github.com/foundry-rs/foundry/issues/4443#issuecomment-1457171444
- * Afterwards the addresses need to be inlined into `foundry.toml`
+ * The addresses need to be inlined into `foundry.toml` to ensure proper verification.
  */
-// contract DeployLogicPart1 is Script {
-//   function run() external {
-//     vm.startBroadcast();
-//     new BorrowLogic();
-//     new BridgeLogic();
-//     new ConfiguratorLogic();
-//     new EModeLogic();
-//     new PoolLogic();
-//     new SupplyLogic();
-//     vm.stopBroadcast();
-//   }
-// }
-
-// contract DeployLogicPart2 is Script {
-//   function run() external {
-//     vm.startBroadcast();
-//     new FlashLoanLogic();
-//     new LiquidationLogic();
-//     vm.stopBroadcast();
-//   }
-// }

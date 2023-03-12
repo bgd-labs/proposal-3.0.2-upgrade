@@ -17,6 +17,7 @@ git-diff :
 	@printf '%s\n%s\n%s\n' "\`\`\`diff" "$$(git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ${before} ${after})" "\`\`\`" > diffs/${out}.md
 
 # Deploy Payloads
+deploy-mainnet-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployMainnet --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
 deploy-polygon-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployPolygon --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
 deploy-optimism-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployOptimism --rpc-url optimism --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
 deploy-arbitrum-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployArbitrum --rpc-url arbitrum --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
@@ -26,7 +27,6 @@ deploy-harmony-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployHarmon
 
 # Create Proposal
 create-proposal-ledger :; forge script scripts/CreateProposal.s.sol:CreateUpgradeProposal --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv
-
 
 storage-diff :
 	forge inspect lib/aave-v3-core/contracts/protocol/pool/Pool.sol:Pool storage-layout --pretty > reports/Pool_v301_layout.md

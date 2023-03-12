@@ -254,6 +254,15 @@ library DeployPayloads {
 
 contract DeployPolygon is Script {
   function run() external {
+    require(block.chainid == 1, 'MAINNET_ONLY');
+    vm.startBroadcast();
+    DeployPayloads.deployMainnet();
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployPolygon is Script {
+  function run() external {
     require(block.chainid == 137, 'POLYGON_ONLY');
     vm.startBroadcast();
     DeployPayloads.deployPolygon();
