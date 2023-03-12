@@ -41,18 +41,21 @@ function getImpl(chain, address) {
   );
 }
 
-const INVALID_KEYS = [
-  "CHAIN_ID", // random artifact
-  "REPAY_WITH_COLLATERAL_ADAPTER", // utility
-  "SWAP_COLLATERAL_ADAPTER", // utility
-  "LISTING_ENGINE", // utility
-  "ACL_ADMIN", // chain specific
-  "COLLECTOR", // done in different proposal,
-  "COLLECTOR_CONTROLLER", // done in different proposal
-  "UI_INCENTIVE_DATA_PROVIDER", // utility
-  "UI_POOL_DATA_PROVIDER", // utility
-  "WALLET_BALANCE_PROVIDER", // utility
-];
+const CONTRACTS = {
+  POOL_ADDRESSES_PROVIDER: {},
+  POOL: {},
+  POOL_CONFIGURATOR: {},
+  ORACLE: {},
+  AAVE_PROTOCOL_DATA_PROVIDER: {},
+  ACL_MANAGER: {},
+  COLLECTOR: {},
+  DEFAULT_INCENTIVES_CONTROLLER: {},
+  DEFAULT_A_TOKEN_IMPL_REV_1: {},
+  DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1: {},
+  DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1: {},
+  EMISSION_MANAGER: {},
+  POOL_ADDRESSES_PROVIDER_REGISTRY: {},
+};
 
 const PROXIES = [
   "COLLECTOR",
@@ -62,27 +65,23 @@ const PROXIES = [
 ];
 
 function downloadContracts(networkName, config) {
-  Object.keys(config)
-    .filter((key) => !INVALID_KEYS.includes(key))
-    .map((key) => {
-      const isProxy = PROXIES.includes(key);
-      download(
-        networkName,
-        isProxy ? `${key}_IMPL` : key,
-        isProxy ? getImpl(networkName, config[key]) : config[key]
-      );
-    });
+  Object.keys(CONTRACTS).map((key) => {
+    const isProxy = PROXIES.includes(key);
+    download(
+      networkName,
+      isProxy ? `${key}_IMPL` : key,
+      isProxy ? getImpl(networkName, config[key]) : config[key]
+    );
+  });
 }
 
 function diffContracts(chain, config) {
-  Object.keys(config)
-    .filter((key) => !INVALID_KEYS.includes(key))
-    .map((key) => {
-      const identifier = PROXIES.includes(key) ? `${key}_IMPL` : key;
-      runCmd(
-        `make git-diff before=downloads/${chain}/${identifier} after=downloads/mainnet/${identifier} out=${identifier}_diff`
-      );
-    });
+  Object.keys(CONTRACTS).map((key) => {
+    const identifier = PROXIES.includes(key) ? `${key}_IMPL` : key;
+    runCmd(
+      `make git-diff before=src/downloads/${chain}/${identifier} after=src/downloads/mainnet/${identifier} out=${identifier}_diff`
+    );
+  });
 }
 
 async function main() {
