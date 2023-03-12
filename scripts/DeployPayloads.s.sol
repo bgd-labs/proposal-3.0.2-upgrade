@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Vm} from 'forge-std/Vm.sol';
 import {Script} from 'forge-std/Script.sol';
-import {IPoolAddressesProvider, IPool, IPoolConfigurator, DataTypes} from 'aave-address-book/AaveV3.sol';
+import {IPoolAddressesProvider, IPool, IPoolConfigurator, DataTypes, IACLManager} from 'aave-address-book/AaveV3.sol';
 
 import {Pool} from 'aave-v3-core/contracts/protocol/pool/Pool.sol';
 import {L2Pool} from 'aave-v3-core/contracts/protocol/pool/L2Pool.sol';
@@ -14,9 +14,13 @@ import {AToken} from 'aave-v3-core/contracts/protocol/tokenization/AToken.sol';
 import {VariableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol';
 import {StableDebtToken} from 'aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol';
 
-import {V301UpgradePayload} from '../src/contracts/V301UpgradePayload.sol';
+import {V301EthereumUpgradePayload, V301L2UpgradePayload, SwapPermissionsPayload, SwapMigratorPermissionsPayload} from '../src/contracts/V301UpgradePayload.sol';
 
+import {AaveV2Ethereum} from 'aave-address-book/AaveV2Ethereum.sol';
+import {AaveV3Ethereum} from 'aave-address-book/AaveV3Ethereum.sol';
+import {AaveV2Polygon} from 'aave-address-book/AaveV2Polygon.sol';
 import {AaveV3Polygon} from 'aave-address-book/AaveV3Polygon.sol';
+import {AaveV2Avalanche} from 'aave-address-book/AaveV2Avalanche.sol';
 import {AaveV3Avalanche} from 'aave-address-book/AaveV3Avalanche.sol';
 import {AaveV3Fantom} from 'aave-address-book/AaveV3Fantom.sol';
 import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
@@ -104,138 +108,147 @@ library DeployPayloads {
     return address(stableDebtTokenImpl);
   }
 
-  function _deployProposal(
-    IPoolAddressesProvider poolAddressesProvider,
-    IPool pool,
-    IPoolConfigurator poolConfigurator,
-    address collector,
-    address incentivesController,
-    address poolImpl
-  ) internal returns (V301UpgradePayload) {
-    address poolPoolConfiguratorImpl = _deployPoolConfiguratorImpl(poolAddressesProvider);
-    address protocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
-    address aTokenImpl = _deployAToken(pool);
-    address vTokenImpl = _deployVToken(pool);
-    address sTokenImpl = _deploySToken(pool);
-
-    return
-      new V301UpgradePayload({
-        poolAddressesProvider: poolAddressesProvider,
-        pool: pool,
-        poolConfigurator: poolConfigurator,
-        collector: collector,
-        incentivesController: incentivesController,
-        newPoolImpl: poolImpl,
-        newPoolConfiguratorImpl: poolPoolConfiguratorImpl,
-        newProtocolDataProvider: protocolDataProvider,
-        newATokenImpl: aTokenImpl,
-        newVTokenImpl: vTokenImpl,
-        newSTokenImpl: sTokenImpl
-      });
-  }
-
   function _deploy(
     IPoolAddressesProvider poolAddressesProvider,
-    IPool pool,
-    IPoolConfigurator poolConfigurator,
-    address collector,
-    address incentivesController
-  ) internal returns (V301UpgradePayload) {
-    address poolImpl = _deployPoolImpl(poolAddressesProvider);
-    return
-      _deployProposal({
-        poolImpl: poolImpl,
-        poolAddressesProvider: poolAddressesProvider,
-        pool: pool,
-        poolConfigurator: poolConfigurator,
-        collector: collector,
-        incentivesController: incentivesController
-      });
+    IPool pool
+  ) internal returns (V301L2UpgradePayload.AddressArgs memory) {
+    V301L2UpgradePayload.AddressArgs memory addresses;
+    addresses.newPoolImpl = _deployPoolImpl(poolAddressesProvider);
+    addresses.newPoolConfiguratorImpl = _deployPoolConfiguratorImpl(poolAddressesProvider);
+    addresses.newProtocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
+    addresses.newATokenImpl = _deployAToken(pool);
+    addresses.newVTokenImpl = _deployVToken(pool);
+    addresses.newSTokenImpl = _deploySToken(pool);
+    addresses.poolAddressesProvider = poolAddressesProvider;
+    addresses.pool = pool;
+    return addresses;
   }
 
   function _deployL2(
     IPoolAddressesProvider poolAddressesProvider,
-    IPool pool,
-    IPoolConfigurator poolConfigurator,
-    address collector,
-    address incentivesController
-  ) internal returns (V301UpgradePayload) {
-    address poolImpl = _deployL2PoolImpl(poolAddressesProvider);
-    return
-      _deployProposal({
-        poolImpl: poolImpl,
-        poolAddressesProvider: poolAddressesProvider,
-        pool: pool,
-        poolConfigurator: poolConfigurator,
-        collector: collector,
-        incentivesController: incentivesController
-      });
+    IPool pool
+  ) internal returns (V301L2UpgradePayload.AddressArgs memory) {
+    V301L2UpgradePayload.AddressArgs memory addresses;
+    addresses.newPoolImpl = _deployL2PoolImpl(poolAddressesProvider);
+    addresses.newPoolConfiguratorImpl = _deployPoolConfiguratorImpl(poolAddressesProvider);
+    addresses.newProtocolDataProvider = _deployProtocolDataProvider(poolAddressesProvider);
+    addresses.newATokenImpl = _deployAToken(pool);
+    addresses.newVTokenImpl = _deployVToken(pool);
+    addresses.newSTokenImpl = _deploySToken(pool);
+    addresses.poolAddressesProvider = poolAddressesProvider;
+    addresses.pool = pool;
+    return addresses;
   }
 
-  function deployPolygon() internal returns (V301UpgradePayload) {
+  function deployMainnet() internal returns (V301EthereumUpgradePayload) {
+    address poolImpl = _deployPoolImpl(AaveV3Ethereum.POOL_ADDRESSES_PROVIDER);
     return
-      _deploy({
-        poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Polygon.POOL,
-        poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
-        collector: AaveV3Polygon.COLLECTOR,
-        incentivesController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new V301EthereumUpgradePayload(
+        AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
+        poolImpl,
+        AaveV3Ethereum.ACL_MANAGER,
+        AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
+        AaveV2Ethereum.MIGRATION_HELPER
+      );
   }
 
-  function deployAvalanche() internal returns (V301UpgradePayload) {
+  function deployPolygon() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+      poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Polygon.POOL
+    });
+    addresses.poolConfigurator = AaveV3Polygon.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Polygon.COLLECTOR;
+    addresses.incentivesController = AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER;
+
     return
-      _deploy({
-        poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Avalanche.POOL,
-        poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
-        collector: AaveV3Avalanche.COLLECTOR,
-        incentivesController: AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new SwapMigratorPermissionsPayload(
+        addresses,
+        AaveV3Polygon.ACL_MANAGER,
+        AaveV3Polygon.SWAP_COLLATERAL_ADAPTER,
+        AaveV2Polygon.MIGRATION_HELPER
+      );
   }
 
-  function deployFantom() internal returns (V301UpgradePayload) {
+  function deployAvalanche() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+      poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Avalanche.POOL
+    });
+    addresses.poolConfigurator = AaveV3Avalanche.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Avalanche.COLLECTOR;
+    addresses.incentivesController = AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER;
+
     return
-      _deploy({
-        poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Fantom.POOL,
-        poolConfigurator: AaveV3Fantom.POOL_CONFIGURATOR,
-        collector: AaveV3Fantom.COLLECTOR,
-        incentivesController: AaveV3Fantom.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new SwapMigratorPermissionsPayload(
+        addresses,
+        AaveV3Avalanche.ACL_MANAGER,
+        AaveV3Avalanche.SWAP_COLLATERAL_ADAPTER,
+        AaveV2Avalanche.MIGRATION_HELPER
+      );
   }
 
-  function deployHarmony() internal returns (V301UpgradePayload) {
+  function deployFantom() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+      poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Fantom.POOL
+    });
+    addresses.poolConfigurator = AaveV3Fantom.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Fantom.COLLECTOR;
+    addresses.incentivesController = AaveV3Fantom.DEFAULT_INCENTIVES_CONTROLLER;
+
     return
-      _deploy({
-        poolAddressesProvider: AaveV3Harmony.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Harmony.POOL,
-        poolConfigurator: AaveV3Harmony.POOL_CONFIGURATOR,
-        collector: AaveV3Harmony.COLLECTOR,
-        incentivesController: AaveV3Harmony.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new SwapPermissionsPayload(
+        addresses,
+        AaveV3Fantom.ACL_MANAGER,
+        AaveV3Fantom.SWAP_COLLATERAL_ADAPTER
+      );
   }
 
-  function deployOptimism() internal returns (V301UpgradePayload) {
+  function deployOptimism() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deployL2({
+      poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Optimism.POOL
+    });
+    addresses.poolConfigurator = AaveV3Optimism.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Optimism.COLLECTOR;
+    addresses.incentivesController = AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER;
+
     return
-      _deployL2({
-        poolAddressesProvider: AaveV3Optimism.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Optimism.POOL,
-        poolConfigurator: AaveV3Optimism.POOL_CONFIGURATOR,
-        collector: AaveV3Optimism.COLLECTOR,
-        incentivesController: AaveV3Optimism.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new SwapPermissionsPayload(
+        addresses,
+        AaveV3Optimism.ACL_MANAGER,
+        AaveV3Optimism.SWAP_COLLATERAL_ADAPTER
+      );
   }
 
-  function deployArbitrum() internal returns (V301UpgradePayload) {
+  function deployArbitrum() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deployL2({
+      poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Arbitrum.POOL
+    });
+    addresses.poolConfigurator = AaveV3Arbitrum.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Arbitrum.COLLECTOR;
+    addresses.incentivesController = AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER;
+
     return
-      _deployL2({
-        poolAddressesProvider: AaveV3Arbitrum.POOL_ADDRESSES_PROVIDER,
-        pool: AaveV3Arbitrum.POOL,
-        poolConfigurator: AaveV3Arbitrum.POOL_CONFIGURATOR,
-        collector: AaveV3Arbitrum.COLLECTOR,
-        incentivesController: AaveV3Arbitrum.DEFAULT_INCENTIVES_CONTROLLER
-      });
+      new SwapPermissionsPayload(
+        addresses,
+        AaveV3Arbitrum.ACL_MANAGER,
+        AaveV3Arbitrum.SWAP_COLLATERAL_ADAPTER
+      );
+  }
+
+  function deployHarmony() internal returns (V301L2UpgradePayload) {
+    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+      poolAddressesProvider: AaveV3Harmony.POOL_ADDRESSES_PROVIDER,
+      pool: AaveV3Harmony.POOL
+    });
+    addresses.poolConfigurator = AaveV3Harmony.POOL_CONFIGURATOR;
+    addresses.collector = AaveV3Harmony.COLLECTOR;
+    addresses.incentivesController = AaveV3Harmony.DEFAULT_INCENTIVES_CONTROLLER;
+
+    return new V301L2UpgradePayload(addresses);
   }
 }
 
