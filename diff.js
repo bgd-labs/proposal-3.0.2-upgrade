@@ -43,55 +43,67 @@ function getImpl(chain, address) {
 
 const CONTRACTS = {
   POOL_ADDRESSES_PROVIDER: {
+    name: "PoolAddressesProvider",
     path: "PoolAddressesProvider/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProvider.sol",
     // reference:
     //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProvider.sol",
   },
   POOL: {
+    name: "Pool",
     path: "Pool/@aave/core-v3/contracts/protocol/pool/Pool.sol",
     reference: "lib/aave-v3-core/contracts/protocol/pool/Pool.sol",
   },
   POOL_CONFIGURATOR: {
+    name: "PoolConfigurator",
     path: "PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol",
     reference: "lib/aave-v3-core/contracts/protocol/pool/PoolConfigurator.sol",
   },
   ORACLE: {
+    name: "AaveOracle",
     path: "AaveOracle/@aave/core-v3/contracts/misc/AaveOracle.sol",
     // reference: "lib/aave-v3-core/contracts/misc/AaveOracle.sol",
   },
   AAVE_PROTOCOL_DATA_PROVIDER: {
+    name: "AaveProtocolDataProvider",
     path: "AaveProtocolDataProvider/@aave/core-v3/contracts/misc/AaveProtocolDataProvider.sol",
     reference: "lib/aave-v3-core/contracts/misc/AaveProtocolDataProvider.sol",
   },
   ACL_MANAGER: {
+    name: "ACLManager",
     path: "ACLManager/@aave/core-v3/contracts/protocol/configuration/ACLManager.sol",
     // reference:
     //   "lib/aave-v3-core/contracts/protocol/configuration/ACLManager.sol",
   },
   DEFAULT_INCENTIVES_CONTROLLER: {
+    name: "RewardsController",
     path: "RewardsController/@aave/periphery-v3/contracts/rewards/RewardsDistributor.sol",
   },
   DEFAULT_A_TOKEN_IMPL_REV_1: {
+    name: "AToken",
     path: "AToken/@aave/core-v3/contracts/protocol/tokenization/AToken.sol",
     reference: "lib/aave-v3-core/contracts/protocol/tokenization/AToken.sol",
   },
   DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1: {
+    name: "VariableDebtToken",
     path: "VariableDebtToken/@aave/core-v3/contracts/protocol/tokenization/VariableDebtToken.sol",
     reference:
       "lib/aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol",
   },
   DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1: {
+    name: "StableDebtToken",
     path: "StableDebtToken/@aave/core-v3/contracts/protocol/tokenization/StableDebtToken.sol",
     reference:
       "lib/aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol",
   },
   EMISSION_MANAGER: {
+    name: "EmissionManager",
     path: "EmissionManager/@aave/periphery-v3/contracts/rewards/EmissionManager.sol",
   },
   POOL_ADDRESSES_PROVIDER_REGISTRY: {
+    name: "PoolAddressesProviderRegistry",
     path: "PoolAddressesProviderRegistry/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
-    // reference:
-    //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
+    reference:
+      "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
   },
 };
 
@@ -113,14 +125,30 @@ function downloadContracts(networkName, config) {
         `forge flatten src/downloads/${networkName}/${identifier}/${CONTRACTS[key].path} --output ${outPath}`
       );
       if (CONTRACTS[key].reference) {
-        // flatten reference
-        runCmd(
-          `forge flatten ${CONTRACTS[key].reference} --output src/downloads/${identifier}.sol`
-        );
-        // diff
-        runCmd(
-          `make git-diff before=${outPath} after=src/downloads/${identifier}.sol out=${key}_${networkName}_diff`
-        );
+        try {
+          // flatten reference
+          runCmd(
+            `forge flatten ${CONTRACTS[key].reference} --output src/downloads/${identifier}.sol`
+          );
+          // diff
+          runCmd(
+            `make git-diff before=${outPath} after=src/downloads/${identifier}.sol out=${identifier}_${networkName}_diff`
+          );
+          // inspect upgrade
+          runCmd(
+            `forge inspect ${CONTRACTS[key].reference}:${CONTRACTS[key].name} storage-layout --pretty > reports/${identifier}_storage.md`
+          );
+          // inspect
+          runCmd(
+            `forge inspect ${outPath}:${CONTRACTS[key].name} storage-layout --pretty > reports/${identifier}_${networkName}_storage.md`
+          );
+          // diff
+          runCmd(
+            `make git-diff before=reports/${identifier}_${networkName}_storage.md after=reports/${identifier}_storage.md out=${identifier}_${networkName}_storage_diff`
+          );
+        } catch (e) {
+          console.log(`error: ${networkName}, ${key}`);
+        }
       }
     }
   });

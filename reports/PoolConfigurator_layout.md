@@ -1,7 +1,0 @@
-| Name                    | Type                            | Slot | Offset | Bytes | Contract                                                                                                                              |
-|-------------------------|---------------------------------|------|--------|-------|---------------------------------------------------------------------------------------------------------------------------------------|
-| lastInitializedRevision | uint256                         | 0    | 0      | 32    | downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator |
-| initializing            | bool                            | 1    | 0      | 1     | downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator |
-| ______gap               | uint256[50]                     | 2    | 0      | 1600  | downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator |
-| _addressesProvider      | contract IPoolAddressesProvider | 52   | 0      | 20    | downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator |
-| _pool                   | contract IPool                  | 53   | 0      | 20    | downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator |
