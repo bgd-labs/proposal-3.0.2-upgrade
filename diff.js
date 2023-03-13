@@ -90,8 +90,8 @@ const CONTRACTS = {
   },
   POOL_ADDRESSES_PROVIDER_REGISTRY: {
     path: "PoolAddressesProviderRegistry/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
-    reference:
-      "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
+    // reference:
+    //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
   },
 };
 
@@ -125,6 +125,7 @@ function downloadContracts(networkName, config) {
     }
   });
 }
+
 async function main() {
   // manually add an IR for diffing
   AaveV3Ethereum.DEFAULT_RESERVE_INTEREST_RATE_STRATEGY =
@@ -133,7 +134,6 @@ async function main() {
     "0xA9F3C3caE095527061e6d270DBE163693e6fda9D";
   downloadContracts("mainnet", AaveV3Ethereum);
   downloadContracts("polygon", AaveV3Polygon);
-  // diffContracts("polygon", AaveV3Polygon);
   download(
     "optimism",
     "L2_POOL_IMPL",

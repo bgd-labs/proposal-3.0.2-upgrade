@@ -4,17 +4,17 @@ pragma solidity ^0.8.10;
 /**
  * @title IScaledBalanceToken
  * @author Aave
- * @notice Defines the basic interface for a scaled-balance token.
- */
+ * @notice Defines the basic interface for a scaledbalance token.
+ **/
 interface IScaledBalanceToken {
   /**
    * @dev Emitted after the mint action
    * @param caller The address performing the mint
-   * @param onBehalfOf The address of the user that will receive the minted tokens
-   * @param value The scaled-up amount being minted (based on user entered amount and balance increase from interest)
-   * @param balanceIncrease The increase in scaled-up balance since the last action of 'onBehalfOf'
+   * @param onBehalfOf The address of the user that will receive the minted scaled balance tokens
+   * @param value The amount being minted (user entered amount + balance increase from interest)
+   * @param balanceIncrease The increase in balance since the last action of the user
    * @param index The next liquidity index of the reserve
-   */
+   **/
   event Mint(
     address indexed caller,
     address indexed onBehalfOf,
@@ -24,14 +24,13 @@ interface IScaledBalanceToken {
   );
 
   /**
-   * @dev Emitted after the burn action
-   * @dev If the burn function does not involve a transfer of the underlying asset, the target defaults to zero address
-   * @param from The address from which the tokens will be burned
+   * @dev Emitted after scaled balance tokens are burned
+   * @param from The address from which the scaled tokens will be burned
    * @param target The address that will receive the underlying, if any
-   * @param value The scaled-up amount being burned (user entered amount - balance increase from interest)
-   * @param balanceIncrease The increase in scaled-up balance since the last action of 'from'
+   * @param value The amount being burned (user entered amount - balance increase from interest)
+   * @param balanceIncrease The increase in balance since the last action of the user
    * @param index The next liquidity index of the reserve
-   */
+   **/
   event Burn(
     address indexed from,
     address indexed target,
@@ -46,7 +45,7 @@ interface IScaledBalanceToken {
    * at the moment of the update
    * @param user The user whose balance is calculated
    * @return The scaled balance of the user
-   */
+   **/
   function scaledBalanceOf(address user) external view returns (uint256);
 
   /**
@@ -54,20 +53,20 @@ interface IScaledBalanceToken {
    * @param user The address of the user
    * @return The scaled balance of the user
    * @return The scaled total supply
-   */
+   **/
   function getScaledUserBalanceAndSupply(address user) external view returns (uint256, uint256);
 
   /**
    * @notice Returns the scaled total supply of the scaled balance token. Represents sum(debt/index)
    * @return The scaled total supply
-   */
+   **/
   function scaledTotalSupply() external view returns (uint256);
 
   /**
    * @notice Returns last index interest was accrued to the user's balance
    * @param user The address of the user
    * @return The last index interest was accrued to the user's balance, expressed in ray
-   */
+   **/
   function getPreviousIndex(address user) external view returns (uint256);
 }
 
@@ -740,17 +739,10 @@ abstract contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function getRewardsData(address asset, address reward)
-    public
-    view
-    override
-    returns (
-      uint256,
-      uint256,
-      uint256,
-      uint256
-    )
-  {
+  function getRewardsData(
+    address asset,
+    address reward
+  ) public view override returns (uint256, uint256, uint256, uint256) {
     return (
       _assets[asset].rewards[reward].index,
       _assets[asset].rewards[reward].emissionPerSecond,
@@ -760,28 +752,24 @@ abstract contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function getAssetIndex(address asset, address reward)
-    external
-    view
-    override
-    returns (uint256, uint256)
-  {
+  function getAssetIndex(
+    address asset,
+    address reward
+  ) external view override returns (uint256, uint256) {
     RewardsDataTypes.RewardData storage rewardData = _assets[asset].rewards[reward];
     return
       _getAssetIndex(
         rewardData,
         IScaledBalanceToken(asset).scaledTotalSupply(),
-        10**_assets[asset].decimals
+        10 ** _assets[asset].decimals
       );
   }
 
   /// @inheritdoc IRewardsDistributor
-  function getDistributionEnd(address asset, address reward)
-    external
-    view
-    override
-    returns (uint256)
-  {
+  function getDistributionEnd(
+    address asset,
+    address reward
+  ) external view override returns (uint256) {
     return _assets[asset].rewards[reward].distributionEnd;
   }
 
@@ -811,12 +799,10 @@ abstract contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function getUserAccruedRewards(address user, address reward)
-    external
-    view
-    override
-    returns (uint256)
-  {
+  function getUserAccruedRewards(
+    address user,
+    address reward
+  ) external view override returns (uint256) {
     uint256 totalAccrued;
     for (uint256 i = 0; i < _assetsList.length; i++) {
       totalAccrued += _assets[_assetsList[i]].rewards[reward].usersData[user].accrued;
@@ -835,7 +821,10 @@ abstract contract RewardsDistributor is IRewardsDistributor {
   }
 
   /// @inheritdoc IRewardsDistributor
-  function getAllUserRewards(address[] calldata assets, address user)
+  function getAllUserRewards(
+    address[] calldata assets,
+    address user
+  )
     external
     view
     override
@@ -905,7 +894,7 @@ abstract contract RewardsDistributor is IRewardsDistributor {
       (uint256 newIndex, ) = _updateRewardData(
         rewardConfig,
         IScaledBalanceToken(asset).scaledTotalSupply(),
-        10**decimals
+        10 ** decimals
       );
 
       uint256 oldEmissionPerSecond = rewardConfig.emissionPerSecond;
@@ -960,7 +949,7 @@ abstract contract RewardsDistributor is IRewardsDistributor {
       (uint256 newIndex, ) = _updateRewardData(
         rewardConfig,
         rewardsInput[i].totalSupply,
-        10**decimals
+        10 ** decimals
       );
 
       // Configure emission and distribution end of the reward per asset
@@ -1057,7 +1046,7 @@ abstract contract RewardsDistributor is IRewardsDistributor {
     uint256 assetUnit;
     uint256 numAvailableRewards = _assets[asset].availableRewardsCount;
     unchecked {
-      assetUnit = 10**_assets[asset].decimals;
+      assetUnit = 10 ** _assets[asset].decimals;
     }
 
     if (numAvailableRewards == 0) {
@@ -1152,7 +1141,7 @@ abstract contract RewardsDistributor is IRewardsDistributor {
     RewardsDataTypes.RewardData storage rewardData = _assets[userAssetBalance.asset].rewards[
       reward
     ];
-    uint256 assetUnit = 10**_assets[userAssetBalance.asset].decimals;
+    uint256 assetUnit = 10 ** _assets[userAssetBalance.asset].decimals;
     (, uint256 nextIndex) = _getAssetIndex(rewardData, userAssetBalance.totalSupply, assetUnit);
 
     return
@@ -1228,11 +1217,10 @@ abstract contract RewardsDistributor is IRewardsDistributor {
    * @param user Address of the user
    * @return userAssetBalances contains a list of structs with user balance and total supply of the given assets
    */
-  function _getUserAssetBalances(address[] calldata assets, address user)
-    internal
-    view
-    virtual
-    returns (RewardsDataTypes.UserAssetBalance[] memory userAssetBalances);
+  function _getUserAssetBalances(
+    address[] calldata assets,
+    address user
+  ) internal view virtual returns (RewardsDataTypes.UserAssetBalance[] memory userAssetBalances);
 
   /// @inheritdoc IRewardsDistributor
   function getAssetDecimals(address asset) external view returns (uint8) {

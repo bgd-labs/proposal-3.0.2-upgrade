@@ -2,7 +2,7 @@
   "name": "bgd-forge-template",
   "version": "1.0.0",
   "scripts": {
-    "download": "node diff.js",
+    "diff": "node diff.js",
     "lint": "prettier ./",
     "lint:fix": "npm run lint -- --write"
   },
