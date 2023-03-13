@@ -41,6 +41,42 @@ function getImpl(chain, address) {
   );
 }
 
+function diffContract(networkName, settings, identifier) {
+  if (settings.path) {
+    // flatten
+    const outPath = `src/downloads/${networkName}/${identifier}.sol`;
+    runCmd(
+      `forge flatten src/downloads/${networkName}/${identifier}/${settings.path} --output ${outPath}`
+    );
+    if (settings.reference) {
+      try {
+        // flatten reference
+        runCmd(
+          `forge flatten ${settings.reference} --output src/downloads/${identifier}.sol`
+        );
+        // diff
+        runCmd(
+          `make git-diff before=${outPath} after=src/downloads/${identifier}.sol out=${identifier}_${networkName}_diff`
+        );
+        // inspect upgrade
+        runCmd(
+          `forge inspect ${settings.reference}:${settings.name} storage-layout --pretty > reports/${identifier}_storage.md`
+        );
+        // inspect
+        runCmd(
+          `forge inspect ${outPath}:${settings.name} storage-layout --pretty > reports/${identifier}_${networkName}_storage.md`
+        );
+        // diff
+        runCmd(
+          `make git-diff before=reports/${identifier}_${networkName}_storage.md after=reports/${identifier}_storage.md out=${identifier}_${networkName}_storage_diff`
+        );
+      } catch (e) {
+        console.log(`error: ${networkName}, ${key}`);
+      }
+    }
+  }
+}
+
 const CONTRACTS = {
   POOL_ADDRESSES_PROVIDER: {
     name: "PoolAddressesProvider",
@@ -102,8 +138,8 @@ const CONTRACTS = {
   POOL_ADDRESSES_PROVIDER_REGISTRY: {
     name: "PoolAddressesProviderRegistry",
     path: "PoolAddressesProviderRegistry/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
-    reference:
-      "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
+    // reference:
+    //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
   },
 };
 
@@ -118,39 +154,7 @@ function downloadContracts(networkName, config) {
       identifier,
       isProxy ? getImpl(networkName, config[key]) : config[key]
     );
-    if (CONTRACTS[key].path) {
-      // flatten
-      const outPath = `src/downloads/${networkName}/${identifier}.sol`;
-      runCmd(
-        `forge flatten src/downloads/${networkName}/${identifier}/${CONTRACTS[key].path} --output ${outPath}`
-      );
-      if (CONTRACTS[key].reference) {
-        try {
-          // flatten reference
-          runCmd(
-            `forge flatten ${CONTRACTS[key].reference} --output src/downloads/${identifier}.sol`
-          );
-          // diff
-          runCmd(
-            `make git-diff before=${outPath} after=src/downloads/${identifier}.sol out=${identifier}_${networkName}_diff`
-          );
-          // inspect upgrade
-          runCmd(
-            `forge inspect ${CONTRACTS[key].reference}:${CONTRACTS[key].name} storage-layout --pretty > reports/${identifier}_storage.md`
-          );
-          // inspect
-          runCmd(
-            `forge inspect ${outPath}:${CONTRACTS[key].name} storage-layout --pretty > reports/${identifier}_${networkName}_storage.md`
-          );
-          // diff
-          runCmd(
-            `make git-diff before=reports/${identifier}_${networkName}_storage.md after=reports/${identifier}_storage.md out=${identifier}_${networkName}_storage_diff`
-          );
-        } catch (e) {
-          console.log(`error: ${networkName}, ${key}`);
-        }
-      }
-    }
+    diffContract(networkName, CONTRACTS[key], identifier);
   });
 }
 
@@ -166,6 +170,15 @@ async function main() {
     "optimism",
     "L2_POOL_IMPL",
     getImpl("optimism", AaveV3Optimism.POOL)
+  );
+  diffContract(
+    "optimism",
+    {
+      name: "L2Pool",
+      path: "L2Pool/@aave/core-v3/contracts/protocol/pool/L2Pool.sol",
+      reference: "lib/aave-v3-core/contracts/protocol/pool/L2Pool.sol",
+    },
+    "L2_POOL_IMPL"
   );
 }
 
