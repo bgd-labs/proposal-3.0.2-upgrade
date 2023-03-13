@@ -71,7 +71,7 @@ function diffContract(networkName, settings, identifier) {
           `make git-diff before=reports/${identifier}_${networkName}_storage.md after=reports/${identifier}_storage.md out=${identifier}_${networkName}_storage_diff`
         );
       } catch (e) {
-        console.log(`error: ${networkName}, ${key}`);
+        console.log(`error: ${networkName}, ${JSON.stringify(settings)}`);
       }
     }
   }
@@ -113,6 +113,7 @@ const CONTRACTS = {
   DEFAULT_INCENTIVES_CONTROLLER: {
     name: "RewardsController",
     path: "RewardsController/@aave/periphery-v3/contracts/rewards/RewardsDistributor.sol",
+    // reference: "lib/aave-v3-periphery/contracts/rewards/RewardsDistributor.sol",
   },
   DEFAULT_A_TOKEN_IMPL_REV_1: {
     name: "AToken",
@@ -134,6 +135,7 @@ const CONTRACTS = {
   EMISSION_MANAGER: {
     name: "EmissionManager",
     path: "EmissionManager/@aave/periphery-v3/contracts/rewards/EmissionManager.sol",
+    // reference: "lib/aave-v3-periphery/contracts/rewards/EmissionManager.sol",
   },
   POOL_ADDRESSES_PROVIDER_REGISTRY: {
     name: "PoolAddressesProviderRegistry",

@@ -11,3 +11,7 @@
 	path = lib/aave-v3-core
 	url = https://github.com/bgd-labs/aave-v3-core
 	branch = chore/bump-revision
+[submodule "lib/aave-v3-periphery"]
+	path = lib/aave-v3-periphery
+	url = https://github.com/aave/aave-v3-periphery
+	branch = v3.0.1

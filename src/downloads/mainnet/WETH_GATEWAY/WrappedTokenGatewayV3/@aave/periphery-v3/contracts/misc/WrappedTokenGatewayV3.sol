@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: AGPL-3.0
 pragma solidity ^0.8.10;
 
-import {Ownable} from '@aave/core-v3/contracts/dependencies/openzeppelin/contracts/Ownable.sol';
-import {IERC20} from '@aave/core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol';
-import {GPv2SafeERC20} from '@aave/core-v3/contracts/dependencies/gnosis/contracts/GPv2SafeERC20.sol';
-import {IWETH} from '@aave/core-v3/contracts/misc/interfaces/IWETH.sol';
-import {IPool} from '@aave/core-v3/contracts/interfaces/IPool.sol';
-import {IAToken} from '@aave/core-v3/contracts/interfaces/IAToken.sol';
-import {ReserveConfiguration} from '@aave/core-v3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
-import {UserConfiguration} from '@aave/core-v3/contracts/protocol/libraries/configuration/UserConfiguration.sol';
-import {DataTypes} from '@aave/core-v3/contracts/protocol/libraries/types/DataTypes.sol';
+import {Ownable} from '../../../core-v3/contracts/dependencies/openzeppelin/contracts/Ownable.sol';
+import {IERC20} from '../../../core-v3/contracts/dependencies/openzeppelin/contracts/IERC20.sol';
+import {GPv2SafeERC20} from '../../../core-v3/contracts/dependencies/gnosis/contracts/GPv2SafeERC20.sol';
+import {IWETH} from '../../../core-v3/contracts/misc/interfaces/IWETH.sol';
+import {IPool} from '../../../core-v3/contracts/interfaces/IPool.sol';
+import {IAToken} from '../../../core-v3/contracts/interfaces/IAToken.sol';
+import {ReserveConfiguration} from '../../../core-v3/contracts/protocol/libraries/configuration/ReserveConfiguration.sol';
+import {UserConfiguration} from '../../../core-v3/contracts/protocol/libraries/configuration/UserConfiguration.sol';
+import {DataTypes} from '../../../core-v3/contracts/protocol/libraries/types/DataTypes.sol';
 import {IWrappedTokenGatewayV3} from './interfaces/IWrappedTokenGatewayV3.sol';
 import {DataTypesHelper} from '../libraries/DataTypesHelper.sol';
 
@@ -30,11 +30,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param weth Address of the Wrapped Ether contract
    * @param owner Address of the owner of this contract
    **/
-  constructor(
-    address weth,
-    address owner,
-    IPool pool
-  ) {
+  constructor(address weth, address owner, IPool pool) {
     WETH = IWETH(weth);
     POOL = pool;
     transferOwnership(owner);
@@ -47,11 +43,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param onBehalfOf address of the user who will receive the aTokens representing the deposit
    * @param referralCode integrators are assigned a referral code and can potentially receive rewards.
    **/
-  function depositETH(
-    address,
-    address onBehalfOf,
-    uint16 referralCode
-  ) external payable override {
+  function depositETH(address, address onBehalfOf, uint16 referralCode) external payable override {
     WETH.deposit{value: msg.value}();
     POOL.deposit(address(WETH), msg.value, onBehalfOf, referralCode);
   }
@@ -61,11 +53,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param amount amount of aWETH to withdraw and receive native ETH
    * @param to address of the user who will receive native ETH
    */
-  function withdrawETH(
-    address,
-    uint256 amount,
-    address to
-  ) external override {
+  function withdrawETH(address, uint256 amount, address to) external override {
     IAToken aWETH = IAToken(POOL.getReserveData(address(WETH)).aTokenAddress);
     uint256 userBalance = aWETH.balanceOf(msg.sender);
     uint256 amountToWithdraw = amount;
@@ -181,11 +169,7 @@ contract WrappedTokenGatewayV3 is IWrappedTokenGatewayV3, Ownable {
    * @param to recipient of the transfer
    * @param amount amount to send
    */
-  function emergencyTokenTransfer(
-    address token,
-    address to,
-    uint256 amount
-  ) external onlyOwner {
+  function emergencyTokenTransfer(address token, address to, uint256 amount) external onlyOwner {
     IERC20(token).safeTransfer(to, amount);
   }
 
