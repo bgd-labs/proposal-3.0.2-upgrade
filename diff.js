@@ -72,6 +72,8 @@ function diffContract(networkName, settings, identifier) {
         );
       } catch (e) {
         console.log(`error: ${networkName}, ${JSON.stringify(settings)}`);
+        console.log(e);
+        throw new Error("lol");
       }
     }
   }
@@ -81,8 +83,8 @@ const CONTRACTS = {
   POOL_ADDRESSES_PROVIDER: {
     name: "PoolAddressesProvider",
     path: "PoolAddressesProvider/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProvider.sol",
-    // reference:
-    //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProvider.sol",
+    reference:
+      "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProvider.sol",
   },
   POOL: {
     name: "Pool",
@@ -97,7 +99,7 @@ const CONTRACTS = {
   ORACLE: {
     name: "AaveOracle",
     path: "AaveOracle/@aave/core-v3/contracts/misc/AaveOracle.sol",
-    // reference: "lib/aave-v3-core/contracts/misc/AaveOracle.sol",
+    reference: "lib/aave-v3-core/contracts/misc/AaveOracle.sol",
   },
   AAVE_PROTOCOL_DATA_PROVIDER: {
     name: "AaveProtocolDataProvider",
@@ -107,13 +109,13 @@ const CONTRACTS = {
   ACL_MANAGER: {
     name: "ACLManager",
     path: "ACLManager/@aave/core-v3/contracts/protocol/configuration/ACLManager.sol",
-    // reference:
-    //   "lib/aave-v3-core/contracts/protocol/configuration/ACLManager.sol",
+    reference:
+      "lib/aave-v3-core/contracts/protocol/configuration/ACLManager.sol",
   },
   DEFAULT_INCENTIVES_CONTROLLER: {
     name: "RewardsController",
-    path: "RewardsController/@aave/periphery-v3/contracts/rewards/RewardsDistributor.sol",
-    // reference: "lib/aave-v3-periphery/contracts/rewards/RewardsDistributor.sol",
+    path: "RewardsController/@aave/periphery-v3/contracts/rewards/RewardsController.sol",
+    reference: "lib/aave-v3-periphery/contracts/rewards/RewardsController.sol",
   },
   DEFAULT_A_TOKEN_IMPL_REV_1: {
     name: "AToken",
@@ -135,13 +137,13 @@ const CONTRACTS = {
   EMISSION_MANAGER: {
     name: "EmissionManager",
     path: "EmissionManager/@aave/periphery-v3/contracts/rewards/EmissionManager.sol",
-    // reference: "lib/aave-v3-periphery/contracts/rewards/EmissionManager.sol",
+    reference: "lib/aave-v3-periphery/contracts/rewards/EmissionManager.sol",
   },
   POOL_ADDRESSES_PROVIDER_REGISTRY: {
     name: "PoolAddressesProviderRegistry",
     path: "PoolAddressesProviderRegistry/@aave/core-v3/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
-    // reference:
-    //   "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
+    reference:
+      "lib/aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol",
   },
 };
 

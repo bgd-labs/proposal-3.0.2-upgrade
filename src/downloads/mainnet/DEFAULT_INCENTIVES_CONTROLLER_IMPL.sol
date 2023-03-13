@@ -2,159 +2,78 @@
 pragma solidity ^0.8.10;
 
 /**
- * @title IScaledBalanceToken
- * @author Aave
- * @notice Defines the basic interface for a scaled-balance token.
+ * @title VersionedInitializable
+ * @author Aave, inspired by the OpenZeppelin Initializable contract
+ * @notice Helper contract to implement initializer functions. To use it, replace
+ * the constructor with a function that has the `initializer` modifier.
+ * @dev WARNING: Unlike constructors, initializer functions must be manually
+ * invoked. This applies both to deploying an Initializable contract, as well
+ * as extending an Initializable contract via inheritance.
+ * WARNING: When used with inheritance, manual care must be taken to not invoke
+ * a parent initializer twice, or ensure that all initializers are idempotent,
+ * because this is not dealt with automatically as with constructors.
  */
-interface IScaledBalanceToken {
+abstract contract VersionedInitializable {
   /**
-   * @dev Emitted after the mint action
-   * @param caller The address performing the mint
-   * @param onBehalfOf The address of the user that will receive the minted tokens
-   * @param value The scaled-up amount being minted (based on user entered amount and balance increase from interest)
-   * @param balanceIncrease The increase in scaled-up balance since the last action of 'onBehalfOf'
-   * @param index The next liquidity index of the reserve
+   * @dev Indicates that the contract has been initialized.
    */
-  event Mint(
-    address indexed caller,
-    address indexed onBehalfOf,
-    uint256 value,
-    uint256 balanceIncrease,
-    uint256 index
-  );
+  uint256 private lastInitializedRevision = 0;
 
   /**
-   * @dev Emitted after the burn action
-   * @dev If the burn function does not involve a transfer of the underlying asset, the target defaults to zero address
-   * @param from The address from which the tokens will be burned
-   * @param target The address that will receive the underlying, if any
-   * @param value The scaled-up amount being burned (user entered amount - balance increase from interest)
-   * @param balanceIncrease The increase in scaled-up balance since the last action of 'from'
-   * @param index The next liquidity index of the reserve
+   * @dev Indicates that the contract is in the process of being initialized.
    */
-  event Burn(
-    address indexed from,
-    address indexed target,
-    uint256 value,
-    uint256 balanceIncrease,
-    uint256 index
-  );
+  bool private initializing;
 
   /**
-   * @notice Returns the scaled balance of the user.
-   * @dev The scaled balance is the sum of all the updated stored balance divided by the reserve's liquidity index
-   * at the moment of the update
-   * @param user The user whose balance is calculated
-   * @return The scaled balance of the user
+   * @dev Modifier to use in the initializer function of a contract.
    */
-  function scaledBalanceOf(address user) external view returns (uint256);
+  modifier initializer() {
+    uint256 revision = getRevision();
+    require(
+      initializing || isConstructor() || revision > lastInitializedRevision,
+      'Contract instance has already been initialized'
+    );
+
+    bool isTopLevelCall = !initializing;
+    if (isTopLevelCall) {
+      initializing = true;
+      lastInitializedRevision = revision;
+    }
+
+    _;
+
+    if (isTopLevelCall) {
+      initializing = false;
+    }
+  }
 
   /**
-   * @notice Returns the scaled balance of the user and the scaled total supply.
-   * @param user The address of the user
-   * @return The scaled balance of the user
-   * @return The scaled total supply
+   * @notice Returns the revision number of the contract
+   * @dev Needs to be defined in the inherited class as a constant.
+   * @return The revision number
    */
-  function getScaledUserBalanceAndSupply(address user) external view returns (uint256, uint256);
+  function getRevision() internal pure virtual returns (uint256);
 
   /**
-   * @notice Returns the scaled total supply of the scaled balance token. Represents sum(debt/index)
-   * @return The scaled total supply
+   * @notice Returns true if and only if the function is running in the constructor
+   * @return True if the function is running in the constructor
    */
-  function scaledTotalSupply() external view returns (uint256);
+  function isConstructor() private view returns (bool) {
+    // extcodesize checks the size of the code stored in an address, and
+    // address returns the current address. Since the code is still not
+    // deployed when running a constructor, any checks on its code size will
+    // yield zero, making it an effective way to detect if a contract is
+    // under construction or not.
+    uint256 cs;
+    //solium-disable-next-line
+    assembly {
+      cs := extcodesize(address())
+    }
+    return cs == 0;
+  }
 
-  /**
-   * @notice Returns last index interest was accrued to the user's balance
-   * @param user The address of the user
-   * @return The last index interest was accrued to the user's balance, expressed in ray
-   */
-  function getPreviousIndex(address user) external view returns (uint256);
-}
-
-/**
- * @dev Interface of the ERC20 standard as defined in the EIP.
- */
-interface IERC20 {
-  /**
-   * @dev Returns the amount of tokens in existence.
-   */
-  function totalSupply() external view returns (uint256);
-
-  /**
-   * @dev Returns the amount of tokens owned by `account`.
-   */
-  function balanceOf(address account) external view returns (uint256);
-
-  /**
-   * @dev Moves `amount` tokens from the caller's account to `recipient`.
-   *
-   * Returns a boolean value indicating whether the operation succeeded.
-   *
-   * Emits a {Transfer} event.
-   */
-  function transfer(address recipient, uint256 amount) external returns (bool);
-
-  /**
-   * @dev Returns the remaining number of tokens that `spender` will be
-   * allowed to spend on behalf of `owner` through {transferFrom}. This is
-   * zero by default.
-   *
-   * This value changes when {approve} or {transferFrom} are called.
-   */
-  function allowance(address owner, address spender) external view returns (uint256);
-
-  /**
-   * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
-   *
-   * Returns a boolean value indicating whether the operation succeeded.
-   *
-   * IMPORTANT: Beware that changing an allowance with this method brings the risk
-   * that someone may use both the old and the new allowance by unfortunate
-   * transaction ordering. One possible solution to mitigate this race
-   * condition is to first reduce the spender's allowance to 0 and set the
-   * desired value afterwards:
-   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
-   *
-   * Emits an {Approval} event.
-   */
-  function approve(address spender, uint256 amount) external returns (bool);
-
-  /**
-   * @dev Moves `amount` tokens from `sender` to `recipient` using the
-   * allowance mechanism. `amount` is then deducted from the caller's
-   * allowance.
-   *
-   * Returns a boolean value indicating whether the operation succeeded.
-   *
-   * Emits a {Transfer} event.
-   */
-  function transferFrom(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external returns (bool);
-
-  /**
-   * @dev Emitted when `value` tokens are moved from one account (`from`) to
-   * another (`to`).
-   *
-   * Note that `value` may be zero.
-   */
-  event Transfer(address indexed from, address indexed to, uint256 value);
-
-  /**
-   * @dev Emitted when the allowance of a `spender` for an `owner` is set by
-   * a call to {approve}. `value` is the new allowance.
-   */
-  event Approval(address indexed owner, address indexed spender, uint256 value);
-}
-
-interface IERC20Detailed is IERC20 {
-  function name() external view returns (string memory);
-
-  function symbol() external view returns (string memory);
-
-  function decimals() external view returns (uint8);
+  // Reserved storage space to allow for layout changes in the future.
+  uint256[50] private ______gap;
 }
 
 // OpenZeppelin Contracts v4.4.1 (utils/math/SafeCast.sol)
@@ -409,6 +328,162 @@ library SafeCast {
     require(value <= uint256(type(int256).max), "SafeCast: value doesn't fit in an int256");
     return int256(value);
   }
+}
+
+/**
+ * @title IScaledBalanceToken
+ * @author Aave
+ * @notice Defines the basic interface for a scaled-balance token.
+ */
+interface IScaledBalanceToken {
+  /**
+   * @dev Emitted after the mint action
+   * @param caller The address performing the mint
+   * @param onBehalfOf The address of the user that will receive the minted tokens
+   * @param value The scaled-up amount being minted (based on user entered amount and balance increase from interest)
+   * @param balanceIncrease The increase in scaled-up balance since the last action of 'onBehalfOf'
+   * @param index The next liquidity index of the reserve
+   */
+  event Mint(
+    address indexed caller,
+    address indexed onBehalfOf,
+    uint256 value,
+    uint256 balanceIncrease,
+    uint256 index
+  );
+
+  /**
+   * @dev Emitted after the burn action
+   * @dev If the burn function does not involve a transfer of the underlying asset, the target defaults to zero address
+   * @param from The address from which the tokens will be burned
+   * @param target The address that will receive the underlying, if any
+   * @param value The scaled-up amount being burned (user entered amount - balance increase from interest)
+   * @param balanceIncrease The increase in scaled-up balance since the last action of 'from'
+   * @param index The next liquidity index of the reserve
+   */
+  event Burn(
+    address indexed from,
+    address indexed target,
+    uint256 value,
+    uint256 balanceIncrease,
+    uint256 index
+  );
+
+  /**
+   * @notice Returns the scaled balance of the user.
+   * @dev The scaled balance is the sum of all the updated stored balance divided by the reserve's liquidity index
+   * at the moment of the update
+   * @param user The user whose balance is calculated
+   * @return The scaled balance of the user
+   */
+  function scaledBalanceOf(address user) external view returns (uint256);
+
+  /**
+   * @notice Returns the scaled balance of the user and the scaled total supply.
+   * @param user The address of the user
+   * @return The scaled balance of the user
+   * @return The scaled total supply
+   */
+  function getScaledUserBalanceAndSupply(address user) external view returns (uint256, uint256);
+
+  /**
+   * @notice Returns the scaled total supply of the scaled balance token. Represents sum(debt/index)
+   * @return The scaled total supply
+   */
+  function scaledTotalSupply() external view returns (uint256);
+
+  /**
+   * @notice Returns last index interest was accrued to the user's balance
+   * @param user The address of the user
+   * @return The last index interest was accrued to the user's balance, expressed in ray
+   */
+  function getPreviousIndex(address user) external view returns (uint256);
+}
+
+/**
+ * @dev Interface of the ERC20 standard as defined in the EIP.
+ */
+interface IERC20 {
+  /**
+   * @dev Returns the amount of tokens in existence.
+   */
+  function totalSupply() external view returns (uint256);
+
+  /**
+   * @dev Returns the amount of tokens owned by `account`.
+   */
+  function balanceOf(address account) external view returns (uint256);
+
+  /**
+   * @dev Moves `amount` tokens from the caller's account to `recipient`.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * Emits a {Transfer} event.
+   */
+  function transfer(address recipient, uint256 amount) external returns (bool);
+
+  /**
+   * @dev Returns the remaining number of tokens that `spender` will be
+   * allowed to spend on behalf of `owner` through {transferFrom}. This is
+   * zero by default.
+   *
+   * This value changes when {approve} or {transferFrom} are called.
+   */
+  function allowance(address owner, address spender) external view returns (uint256);
+
+  /**
+   * @dev Sets `amount` as the allowance of `spender` over the caller's tokens.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * IMPORTANT: Beware that changing an allowance with this method brings the risk
+   * that someone may use both the old and the new allowance by unfortunate
+   * transaction ordering. One possible solution to mitigate this race
+   * condition is to first reduce the spender's allowance to 0 and set the
+   * desired value afterwards:
+   * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
+   *
+   * Emits an {Approval} event.
+   */
+  function approve(address spender, uint256 amount) external returns (bool);
+
+  /**
+   * @dev Moves `amount` tokens from `sender` to `recipient` using the
+   * allowance mechanism. `amount` is then deducted from the caller's
+   * allowance.
+   *
+   * Returns a boolean value indicating whether the operation succeeded.
+   *
+   * Emits a {Transfer} event.
+   */
+  function transferFrom(
+    address sender,
+    address recipient,
+    uint256 amount
+  ) external returns (bool);
+
+  /**
+   * @dev Emitted when `value` tokens are moved from one account (`from`) to
+   * another (`to`).
+   *
+   * Note that `value` may be zero.
+   */
+  event Transfer(address indexed from, address indexed to, uint256 value);
+
+  /**
+   * @dev Emitted when the allowance of a `spender` for an `owner` is set by
+   * a call to {approve}. `value` is the new allowance.
+   */
+  event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
+interface IERC20Detailed is IERC20 {
+  function name() external view returns (string memory);
+
+  function symbol() external view returns (string memory);
+
+  function decimals() external view returns (uint8);
 }
 
 /**
@@ -1231,5 +1306,548 @@ abstract contract RewardsDistributor is IRewardsDistributor {
   /// @inheritdoc IRewardsDistributor
   function getEmissionManager() external view returns (address) {
     return EMISSION_MANAGER;
+  }
+}
+
+/**
+ * @title IRewardsController
+ * @author Aave
+ * @notice Defines the basic interface for a Rewards Controller.
+ */
+interface IRewardsController is IRewardsDistributor {
+  /**
+   * @dev Emitted when a new address is whitelisted as claimer of rewards on behalf of a user
+   * @param user The address of the user
+   * @param claimer The address of the claimer
+   */
+  event ClaimerSet(address indexed user, address indexed claimer);
+
+  /**
+   * @dev Emitted when rewards are claimed
+   * @param user The address of the user rewards has been claimed on behalf of
+   * @param reward The address of the token reward is claimed
+   * @param to The address of the receiver of the rewards
+   * @param claimer The address of the claimer
+   * @param amount The amount of rewards claimed
+   */
+  event RewardsClaimed(
+    address indexed user,
+    address indexed reward,
+    address indexed to,
+    address claimer,
+    uint256 amount
+  );
+
+  /**
+   * @dev Emitted when a transfer strategy is installed for the reward distribution
+   * @param reward The address of the token reward
+   * @param transferStrategy The address of TransferStrategy contract
+   */
+  event TransferStrategyInstalled(address indexed reward, address indexed transferStrategy);
+
+  /**
+   * @dev Emitted when the reward oracle is updated
+   * @param reward The address of the token reward
+   * @param rewardOracle The address of oracle
+   */
+  event RewardOracleUpdated(address indexed reward, address indexed rewardOracle);
+
+  /**
+   * @dev Whitelists an address to claim the rewards on behalf of another address
+   * @param user The address of the user
+   * @param claimer The address of the claimer
+   */
+  function setClaimer(address user, address claimer) external;
+
+  /**
+   * @dev Sets a TransferStrategy logic contract that determines the logic of the rewards transfer
+   * @param reward The address of the reward token
+   * @param transferStrategy The address of the TransferStrategy logic contract
+   */
+  function setTransferStrategy(address reward, ITransferStrategyBase transferStrategy) external;
+
+  /**
+   * @dev Sets an Aave Oracle contract to enforce rewards with a source of value.
+   * @notice At the moment of reward configuration, the Incentives Controller performs
+   * a check to see if the reward asset oracle is compatible with IEACAggregator proxy.
+   * This check is enforced for integrators to be able to show incentives at
+   * the current Aave UI without the need to setup an external price registry
+   * @param reward The address of the reward to set the price aggregator
+   * @param rewardOracle The address of price aggregator that follows IEACAggregatorProxy interface
+   */
+  function setRewardOracle(address reward, IEACAggregatorProxy rewardOracle) external;
+
+  /**
+   * @dev Get the price aggregator oracle address
+   * @param reward The address of the reward
+   * @return The price oracle of the reward
+   */
+  function getRewardOracle(address reward) external view returns (address);
+
+  /**
+   * @dev Returns the whitelisted claimer for a certain address (0x0 if not set)
+   * @param user The address of the user
+   * @return The claimer address
+   */
+  function getClaimer(address user) external view returns (address);
+
+  /**
+   * @dev Returns the Transfer Strategy implementation contract address being used for a reward address
+   * @param reward The address of the reward
+   * @return The address of the TransferStrategy contract
+   */
+  function getTransferStrategy(address reward) external view returns (address);
+
+  /**
+   * @dev Configure assets to incentivize with an emission of rewards per second until the end of distribution.
+   * @param config The assets configuration input, the list of structs contains the following fields:
+   *   uint104 emissionPerSecond: The emission per second following rewards unit decimals.
+   *   uint256 totalSupply: The total supply of the asset to incentivize
+   *   uint40 distributionEnd: The end of the distribution of the incentives for an asset
+   *   address asset: The asset address to incentivize
+   *   address reward: The reward token address
+   *   ITransferStrategy transferStrategy: The TransferStrategy address with the install hook and claim logic.
+   *   IEACAggregatorProxy rewardOracle: The Price Oracle of a reward to visualize the incentives at the UI Frontend.
+   *                                     Must follow Chainlink Aggregator IEACAggregatorProxy interface to be compatible.
+   */
+  function configureAssets(RewardsDataTypes.RewardsConfigInput[] memory config) external;
+
+  /**
+   * @dev Called by the corresponding asset on transfer hook in order to update the rewards distribution.
+   * @dev The units of `totalSupply` and `userBalance` should be the same.
+   * @param user The address of the user whose asset balance has changed
+   * @param totalSupply The total supply of the asset prior to user balance change
+   * @param userBalance The previous user balance prior to balance change
+   **/
+  function handleAction(
+    address user,
+    uint256 totalSupply,
+    uint256 userBalance
+  ) external;
+
+  /**
+   * @dev Claims reward for a user to the desired address, on all the assets of the pool, accumulating the pending rewards
+   * @param assets List of assets to check eligible distributions before claiming rewards
+   * @param amount The amount of rewards to claim
+   * @param to The address that will be receiving the rewards
+   * @param reward The address of the reward token
+   * @return The amount of rewards claimed
+   **/
+  function claimRewards(
+    address[] calldata assets,
+    uint256 amount,
+    address to,
+    address reward
+  ) external returns (uint256);
+
+  /**
+   * @dev Claims reward for a user on behalf, on all the assets of the pool, accumulating the pending rewards. The
+   * caller must be whitelisted via "allowClaimOnBehalf" function by the RewardsAdmin role manager
+   * @param assets The list of assets to check eligible distributions before claiming rewards
+   * @param amount The amount of rewards to claim
+   * @param user The address to check and claim rewards
+   * @param to The address that will be receiving the rewards
+   * @param reward The address of the reward token
+   * @return The amount of rewards claimed
+   **/
+  function claimRewardsOnBehalf(
+    address[] calldata assets,
+    uint256 amount,
+    address user,
+    address to,
+    address reward
+  ) external returns (uint256);
+
+  /**
+   * @dev Claims reward for msg.sender, on all the assets of the pool, accumulating the pending rewards
+   * @param assets The list of assets to check eligible distributions before claiming rewards
+   * @param amount The amount of rewards to claim
+   * @param reward The address of the reward token
+   * @return The amount of rewards claimed
+   **/
+  function claimRewardsToSelf(
+    address[] calldata assets,
+    uint256 amount,
+    address reward
+  ) external returns (uint256);
+
+  /**
+   * @dev Claims all rewards for a user to the desired address, on all the assets of the pool, accumulating the pending rewards
+   * @param assets The list of assets to check eligible distributions before claiming rewards
+   * @param to The address that will be receiving the rewards
+   * @return rewardsList List of addresses of the reward tokens
+   * @return claimedAmounts List that contains the claimed amount per reward, following same order as "rewardList"
+   **/
+  function claimAllRewards(address[] calldata assets, address to)
+    external
+    returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
+
+  /**
+   * @dev Claims all rewards for a user on behalf, on all the assets of the pool, accumulating the pending rewards. The caller must
+   * be whitelisted via "allowClaimOnBehalf" function by the RewardsAdmin role manager
+   * @param assets The list of assets to check eligible distributions before claiming rewards
+   * @param user The address to check and claim rewards
+   * @param to The address that will be receiving the rewards
+   * @return rewardsList List of addresses of the reward tokens
+   * @return claimedAmounts List that contains the claimed amount per reward, following same order as "rewardsList"
+   **/
+  function claimAllRewardsOnBehalf(
+    address[] calldata assets,
+    address user,
+    address to
+  ) external returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
+
+  /**
+   * @dev Claims all reward for msg.sender, on all the assets of the pool, accumulating the pending rewards
+   * @param assets The list of assets to check eligible distributions before claiming rewards
+   * @return rewardsList List of addresses of the reward tokens
+   * @return claimedAmounts List that contains the claimed amount per reward, following same order as "rewardsList"
+   **/
+  function claimAllRewardsToSelf(address[] calldata assets)
+    external
+    returns (address[] memory rewardsList, uint256[] memory claimedAmounts);
+}
+
+/**
+ * @title RewardsController
+ * @notice Abstract contract template to build Distributors contracts for ERC20 rewards to protocol participants
+ * @author Aave
+ **/
+contract RewardsController is RewardsDistributor, VersionedInitializable, IRewardsController {
+  using SafeCast for uint256;
+
+  uint256 public constant REVISION = 1;
+
+  // This mapping allows whitelisted addresses to claim on behalf of others
+  // useful for contracts that hold tokens to be rewarded but don't have any native logic to claim Liquidity Mining rewards
+  mapping(address => address) internal _authorizedClaimers;
+
+  // reward => transfer strategy implementation contract
+  // The TransferStrategy contract abstracts the logic regarding
+  // the source of the reward and how to transfer it to the user.
+  mapping(address => ITransferStrategyBase) internal _transferStrategy;
+
+  // This mapping contains the price oracle per reward.
+  // A price oracle is enforced for integrators to be able to show incentives at
+  // the current Aave UI without the need to setup an external price registry
+  // At the moment of reward configuration, the Incentives Controller performs
+  // a check to see if the provided reward oracle contains `latestAnswer`.
+  mapping(address => IEACAggregatorProxy) internal _rewardOracle;
+
+  modifier onlyAuthorizedClaimers(address claimer, address user) {
+    require(_authorizedClaimers[user] == claimer, 'CLAIMER_UNAUTHORIZED');
+    _;
+  }
+
+  constructor(address emissionManager) RewardsDistributor(emissionManager) {}
+
+  /**
+   * @dev Initialize for RewardsController
+   * @dev It expects an address as argument since its initialized via PoolAddressesProvider._updateImpl()
+   **/
+  function initialize(address) external initializer {}
+
+  /// @inheritdoc IRewardsController
+  function getClaimer(address user) external view override returns (address) {
+    return _authorizedClaimers[user];
+  }
+
+  /**
+   * @dev Returns the revision of the implementation contract
+   * @return uint256, current revision version
+   */
+  function getRevision() internal pure override returns (uint256) {
+    return REVISION;
+  }
+
+  /// @inheritdoc IRewardsController
+  function getRewardOracle(address reward) external view override returns (address) {
+    return address(_rewardOracle[reward]);
+  }
+
+  /// @inheritdoc IRewardsController
+  function getTransferStrategy(address reward) external view override returns (address) {
+    return address(_transferStrategy[reward]);
+  }
+
+  /// @inheritdoc IRewardsController
+  function configureAssets(
+    RewardsDataTypes.RewardsConfigInput[] memory config
+  ) external override onlyEmissionManager {
+    for (uint256 i = 0; i < config.length; i++) {
+      // Get the current Scaled Total Supply of AToken or Debt token
+      config[i].totalSupply = IScaledBalanceToken(config[i].asset).scaledTotalSupply();
+
+      // Install TransferStrategy logic at IncentivesController
+      _installTransferStrategy(config[i].reward, config[i].transferStrategy);
+
+      // Set reward oracle, enforces input oracle to have latestPrice function
+      _setRewardOracle(config[i].reward, config[i].rewardOracle);
+    }
+    _configureAssets(config);
+  }
+
+  /// @inheritdoc IRewardsController
+  function setTransferStrategy(
+    address reward,
+    ITransferStrategyBase transferStrategy
+  ) external onlyEmissionManager {
+    _installTransferStrategy(reward, transferStrategy);
+  }
+
+  /// @inheritdoc IRewardsController
+  function setRewardOracle(
+    address reward,
+    IEACAggregatorProxy rewardOracle
+  ) external onlyEmissionManager {
+    _setRewardOracle(reward, rewardOracle);
+  }
+
+  /// @inheritdoc IRewardsController
+  function handleAction(address user, uint256 totalSupply, uint256 userBalance) external override {
+    _updateData(msg.sender, user, userBalance, totalSupply);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimRewards(
+    address[] calldata assets,
+    uint256 amount,
+    address to,
+    address reward
+  ) external override returns (uint256) {
+    require(to != address(0), 'INVALID_TO_ADDRESS');
+    return _claimRewards(assets, amount, msg.sender, msg.sender, to, reward);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimRewardsOnBehalf(
+    address[] calldata assets,
+    uint256 amount,
+    address user,
+    address to,
+    address reward
+  ) external override onlyAuthorizedClaimers(msg.sender, user) returns (uint256) {
+    require(user != address(0), 'INVALID_USER_ADDRESS');
+    require(to != address(0), 'INVALID_TO_ADDRESS');
+    return _claimRewards(assets, amount, msg.sender, user, to, reward);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimRewardsToSelf(
+    address[] calldata assets,
+    uint256 amount,
+    address reward
+  ) external override returns (uint256) {
+    return _claimRewards(assets, amount, msg.sender, msg.sender, msg.sender, reward);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimAllRewards(
+    address[] calldata assets,
+    address to
+  ) external override returns (address[] memory rewardsList, uint256[] memory claimedAmounts) {
+    require(to != address(0), 'INVALID_TO_ADDRESS');
+    return _claimAllRewards(assets, msg.sender, msg.sender, to);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimAllRewardsOnBehalf(
+    address[] calldata assets,
+    address user,
+    address to
+  )
+    external
+    override
+    onlyAuthorizedClaimers(msg.sender, user)
+    returns (address[] memory rewardsList, uint256[] memory claimedAmounts)
+  {
+    require(user != address(0), 'INVALID_USER_ADDRESS');
+    require(to != address(0), 'INVALID_TO_ADDRESS');
+    return _claimAllRewards(assets, msg.sender, user, to);
+  }
+
+  /// @inheritdoc IRewardsController
+  function claimAllRewardsToSelf(
+    address[] calldata assets
+  ) external override returns (address[] memory rewardsList, uint256[] memory claimedAmounts) {
+    return _claimAllRewards(assets, msg.sender, msg.sender, msg.sender);
+  }
+
+  /// @inheritdoc IRewardsController
+  function setClaimer(address user, address caller) external override onlyEmissionManager {
+    _authorizedClaimers[user] = caller;
+    emit ClaimerSet(user, caller);
+  }
+
+  /**
+   * @dev Get user balances and total supply of all the assets specified by the assets parameter
+   * @param assets List of assets to retrieve user balance and total supply
+   * @param user Address of the user
+   * @return userAssetBalances contains a list of structs with user balance and total supply of the given assets
+   */
+  function _getUserAssetBalances(
+    address[] calldata assets,
+    address user
+  ) internal view override returns (RewardsDataTypes.UserAssetBalance[] memory userAssetBalances) {
+    userAssetBalances = new RewardsDataTypes.UserAssetBalance[](assets.length);
+    for (uint256 i = 0; i < assets.length; i++) {
+      userAssetBalances[i].asset = assets[i];
+      (userAssetBalances[i].userBalance, userAssetBalances[i].totalSupply) = IScaledBalanceToken(
+        assets[i]
+      ).getScaledUserBalanceAndSupply(user);
+    }
+    return userAssetBalances;
+  }
+
+  /**
+   * @dev Claims one type of reward for a user on behalf, on all the assets of the pool, accumulating the pending rewards.
+   * @param assets List of assets to check eligible distributions before claiming rewards
+   * @param amount Amount of rewards to claim
+   * @param claimer Address of the claimer who claims rewards on behalf of user
+   * @param user Address to check and claim rewards
+   * @param to Address that will be receiving the rewards
+   * @param reward Address of the reward token
+   * @return Rewards claimed
+   **/
+  function _claimRewards(
+    address[] calldata assets,
+    uint256 amount,
+    address claimer,
+    address user,
+    address to,
+    address reward
+  ) internal returns (uint256) {
+    if (amount == 0) {
+      return 0;
+    }
+    uint256 totalRewards;
+
+    _updateDataMultiple(user, _getUserAssetBalances(assets, user));
+    for (uint256 i = 0; i < assets.length; i++) {
+      address asset = assets[i];
+      totalRewards += _assets[asset].rewards[reward].usersData[user].accrued;
+
+      if (totalRewards <= amount) {
+        _assets[asset].rewards[reward].usersData[user].accrued = 0;
+      } else {
+        uint256 difference = totalRewards - amount;
+        totalRewards -= difference;
+        _assets[asset].rewards[reward].usersData[user].accrued = difference.toUint128();
+        break;
+      }
+    }
+
+    if (totalRewards == 0) {
+      return 0;
+    }
+
+    _transferRewards(to, reward, totalRewards);
+    emit RewardsClaimed(user, reward, to, claimer, totalRewards);
+
+    return totalRewards;
+  }
+
+  /**
+   * @dev Claims one type of reward for a user on behalf, on all the assets of the pool, accumulating the pending rewards.
+   * @param assets List of assets to check eligible distributions before claiming rewards
+   * @param claimer Address of the claimer on behalf of user
+   * @param user Address to check and claim rewards
+   * @param to Address that will be receiving the rewards
+   * @return
+   *   rewardsList List of reward addresses
+   *   claimedAmount List of claimed amounts, follows "rewardsList" items order
+   **/
+  function _claimAllRewards(
+    address[] calldata assets,
+    address claimer,
+    address user,
+    address to
+  ) internal returns (address[] memory rewardsList, uint256[] memory claimedAmounts) {
+    uint256 rewardsListLength = _rewardsList.length;
+    rewardsList = new address[](rewardsListLength);
+    claimedAmounts = new uint256[](rewardsListLength);
+
+    _updateDataMultiple(user, _getUserAssetBalances(assets, user));
+
+    for (uint256 i = 0; i < assets.length; i++) {
+      address asset = assets[i];
+      for (uint256 j = 0; j < rewardsListLength; j++) {
+        if (rewardsList[j] == address(0)) {
+          rewardsList[j] = _rewardsList[j];
+        }
+        uint256 rewardAmount = _assets[asset].rewards[rewardsList[j]].usersData[user].accrued;
+        if (rewardAmount != 0) {
+          claimedAmounts[j] += rewardAmount;
+          _assets[asset].rewards[rewardsList[j]].usersData[user].accrued = 0;
+        }
+      }
+    }
+    for (uint256 i = 0; i < rewardsListLength; i++) {
+      _transferRewards(to, rewardsList[i], claimedAmounts[i]);
+      emit RewardsClaimed(user, rewardsList[i], to, claimer, claimedAmounts[i]);
+    }
+    return (rewardsList, claimedAmounts);
+  }
+
+  /**
+   * @dev Function to transfer rewards to the desired account using delegatecall and
+   * @param to Account address to send the rewards
+   * @param reward Address of the reward token
+   * @param amount Amount of rewards to transfer
+   */
+  function _transferRewards(address to, address reward, uint256 amount) internal {
+    ITransferStrategyBase transferStrategy = _transferStrategy[reward];
+
+    bool success = transferStrategy.performTransfer(to, reward, amount);
+
+    require(success == true, 'TRANSFER_ERROR');
+  }
+
+  /**
+   * @dev Returns true if `account` is a contract.
+   * @param account The address of the account
+   * @return bool, true if contract, false otherwise
+   */
+  function _isContract(address account) internal view returns (bool) {
+    // This method relies on extcodesize, which returns 0 for contracts in
+    // construction, since the code is only stored at the end of the
+    // constructor execution.
+
+    uint256 size;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      size := extcodesize(account)
+    }
+    return size > 0;
+  }
+
+  /**
+   * @dev Internal function to call the optional install hook at the TransferStrategy
+   * @param reward The address of the reward token
+   * @param transferStrategy The address of the reward TransferStrategy
+   */
+  function _installTransferStrategy(
+    address reward,
+    ITransferStrategyBase transferStrategy
+  ) internal {
+    require(address(transferStrategy) != address(0), 'STRATEGY_CAN_NOT_BE_ZERO');
+    require(_isContract(address(transferStrategy)) == true, 'STRATEGY_MUST_BE_CONTRACT');
+
+    _transferStrategy[reward] = transferStrategy;
+
+    emit TransferStrategyInstalled(reward, address(transferStrategy));
+  }
+
+  /**
+   * @dev Update the Price Oracle of a reward token. The Price Oracle must follow Chainlink IEACAggregatorProxy interface.
+   * @notice The Price Oracle of a reward is used for displaying correct data about the incentives at the UI frontend.
+   * @param reward The address of the reward token
+   * @param rewardOracle The address of the price oracle
+   */
+
+  function _setRewardOracle(address reward, IEACAggregatorProxy rewardOracle) internal {
+    require(rewardOracle.latestAnswer() > 0, 'ORACLE_MUST_RETURN_PRICE');
+    _rewardOracle[reward] = rewardOracle;
+    emit RewardOracleUpdated(reward, address(rewardOracle));
   }
 }
