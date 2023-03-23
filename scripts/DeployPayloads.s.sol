@@ -27,15 +27,6 @@ import {AaveV3Harmony} from 'aave-address-book/AaveV3Harmony.sol';
 import {AaveV3Optimism} from 'aave-address-book/AaveV3Optimism.sol';
 import {AaveV3Arbitrum} from 'aave-address-book/AaveV3Arbitrum.sol';
 
-// importing some unused files to make them available within the file graph
-// funky workaround for https://github.com/gakonst/ethers-rs/pull/2256/files
-import 'aave-v3-core/contracts/protocol/configuration/PoolAddressesProviderRegistry.sol';
-import 'aave-v3-periphery/contracts/rewards/EmissionManager.sol';
-import 'aave-v3-periphery/contracts/rewards/RewardsController.sol';
-import 'aave-v3-core/contracts/protocol/configuration/ACLManager.sol';
-import 'aave-v3-core/contracts/misc/AaveOracle.sol';
-import 'aave-v3-core/contracts/protocol/configuration/PoolAddressesProvider.sol';
-
 library DeployPayloads {
   function _deployPoolImpl(
     IPoolAddressesProvider poolAddressesProvider
@@ -261,7 +252,7 @@ library DeployPayloads {
   }
 }
 
-contract DeployPolygon is Script {
+contract DeployMainnet is Script {
   function run() external {
     require(block.chainid == 1, 'MAINNET_ONLY');
     vm.startBroadcast();
