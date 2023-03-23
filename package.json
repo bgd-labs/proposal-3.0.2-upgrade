@@ -2,6 +2,7 @@
   "name": "bgd-forge-template",
   "version": "1.0.0",
   "scripts": {
+    "diff": "node diff.js",
     "lint": "prettier ./",
     "lint:fix": "npm run lint -- --write"
   },
@@ -21,7 +22,7 @@
     "prettier-plugin-solidity": "^1.1.1"
   },
   "dependencies": {
-    "@bgd-labs/aave-address-book": "^1.13.1",
+    "@bgd-labs/aave-address-book": "^1.19.0",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
   }
