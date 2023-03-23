@@ -1,9 +1,49 @@
 ```diff
 diff --git a/src/downloads/polygon/DEFAULT_A_TOKEN_IMPL_REV_1.sol b/src/downloads/DEFAULT_A_TOKEN_IMPL_REV_1.sol
-index 9195c28..1b84ad9 100644
+index 9195c28..61d1748 100644
 --- a/src/downloads/polygon/DEFAULT_A_TOKEN_IMPL_REV_1.sol
 +++ b/src/downloads/DEFAULT_A_TOKEN_IMPL_REV_1.sol
-@@ -503,13 +503,13 @@ abstract contract VersionedInitializable {
+@@ -58,11 +58,7 @@ interface IERC20 {
+    *
+    * Emits a {Transfer} event.
+    */
+-  function transferFrom(
+-    address sender,
+-    address recipient,
+-    uint256 amount
+-  ) external returns (bool);
++  function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+ 
+   /**
+    * @dev Emitted when `value` tokens are moved from one account (`from`) to
+@@ -85,11 +81,7 @@ interface IERC20 {
+ library GPv2SafeERC20 {
+   /// @dev Wrapper around a call to the ERC20 function `transfer` that reverts
+   /// also when the token returns `false`.
+-  function safeTransfer(
+-    IERC20 token,
+-    address to,
+-    uint256 value
+-  ) internal {
++  function safeTransfer(IERC20 token, address to, uint256 value) internal {
+     bytes4 selector_ = token.transfer.selector;
+ 
+     // solhint-disable-next-line no-inline-assembly
+@@ -110,12 +102,7 @@ library GPv2SafeERC20 {
+ 
+   /// @dev Wrapper around a call to the ERC20 function `transferFrom` that
+   /// reverts also when the token returns `false`.
+-  function safeTransferFrom(
+-    IERC20 token,
+-    address from,
+-    address to,
+-    uint256 value
+-  ) internal {
++  function safeTransferFrom(IERC20 token, address from, address to, uint256 value) internal {
+     bytes4 selector_ = token.transferFrom.selector;
+ 
+     // solhint-disable-next-line no-inline-assembly
+@@ -503,13 +490,13 @@ abstract contract VersionedInitializable {
     * @notice Returns the revision number of the contract
     * @dev Needs to be defined in the inherited class as a constant.
     * @return The revision number
@@ -19,7 +59,7 @@ index 9195c28..1b84ad9 100644
    function isConstructor() private view returns (bool) {
      // extcodesize checks the size of the code stored in an address, and
      // address returns the current address. Since the code is still not
-@@ -581,13 +581,12 @@ library Errors {
+@@ -581,13 +568,12 @@ library Errors {
    string public constant HEALTH_FACTOR_NOT_BELOW_THRESHOLD = '45'; // 'Health factor is not below the threshold'
    string public constant COLLATERAL_CANNOT_BE_LIQUIDATED = '46'; // 'The collateral chosen cannot be liquidated'
    string public constant SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = '47'; // 'User did not borrow the specified currency'
@@ -34,7 +74,16 @@ index 9195c28..1b84ad9 100644
    string public constant STABLE_DEBT_NOT_ZERO = '55'; // 'Stable debt supply is not zero'
    string public constant VARIABLE_DEBT_SUPPLY_NOT_ZERO = '56'; // 'Variable debt supply is not zero'
    string public constant LTV_VALIDATION_FAILED = '57'; // 'Ltv validation failed'
-@@ -624,6 +623,7 @@ library Errors {
+@@ -595,7 +581,7 @@ library Errors {
+   string public constant PRICE_ORACLE_SENTINEL_CHECK_FAILED = '59'; // 'Price oracle sentinel validation failed'
+   string public constant ASSET_NOT_BORROWABLE_IN_ISOLATION = '60'; // 'Asset is not borrowable in isolation mode'
+   string public constant RESERVE_ALREADY_INITIALIZED = '61'; // 'Reserve has already been initialized'
+-  string public constant USER_IN_ISOLATION_MODE = '62'; // 'User is in isolation mode'
++  string public constant USER_IN_ISOLATION_MODE_OR_LTV_ZERO = '62'; // 'User is in isolation mode or ltv is zero'
+   string public constant INVALID_LTV = '63'; // 'Invalid ltv parameter for the reserve'
+   string public constant INVALID_LIQ_THRESHOLD = '64'; // 'Invalid liquidity threshold parameter for the reserve'
+   string public constant INVALID_LIQ_BONUS = '65'; // 'Invalid liquidity bonus parameter for the reserve'
+@@ -624,6 +610,7 @@ library Errors {
    string public constant STABLE_BORROWING_ENABLED = '88'; // 'Stable borrowing is enabled'
    string public constant SILOED_BORROWING_VIOLATION = '89'; // 'User is trying to borrow multiple assets including a siloed one'
    string public constant RESERVE_DEBT_NOT_ZERO = '90'; // the total debt of the reserve needs to be 0
@@ -42,7 +91,7 @@ index 9195c28..1b84ad9 100644
  }
  
  /**
-@@ -633,7 +633,7 @@ library Errors {
+@@ -633,7 +620,7 @@ library Errors {
   * @dev Provides mul and div function for wads (decimal numbers with 18 digits of precision) and rays (decimal numbers
   * with 27 digits of precision)
   * @dev Operations are rounded. If a value is >=.5, will be rounded up, otherwise rounded down.
@@ -51,7 +100,7 @@ index 9195c28..1b84ad9 100644
  library WadRayMath {
    // HALF_WAD and HALF_RAY expressed with extended notation as constant with operations are not supported in Yul assembly
    uint256 internal constant WAD = 1e18;
-@@ -650,7 +650,7 @@ library WadRayMath {
+@@ -650,7 +637,7 @@ library WadRayMath {
     * @param a Wad
     * @param b Wad
     * @return c = a*b, in wad
@@ -60,7 +109,7 @@ index 9195c28..1b84ad9 100644
    function wadMul(uint256 a, uint256 b) internal pure returns (uint256 c) {
      // to avoid overflow, a <= (type(uint256).max - HALF_WAD) / b
      assembly {
-@@ -668,7 +668,7 @@ library WadRayMath {
+@@ -668,7 +655,7 @@ library WadRayMath {
     * @param a Wad
     * @param b Wad
     * @return c = a/b, in wad
@@ -69,7 +118,7 @@ index 9195c28..1b84ad9 100644
    function wadDiv(uint256 a, uint256 b) internal pure returns (uint256 c) {
      // to avoid overflow, a <= (type(uint256).max - halfB) / WAD
      assembly {
-@@ -686,7 +686,7 @@ library WadRayMath {
+@@ -686,7 +673,7 @@ library WadRayMath {
     * @param a Ray
     * @param b Ray
     * @return c = a raymul b
@@ -78,7 +127,7 @@ index 9195c28..1b84ad9 100644
    function rayMul(uint256 a, uint256 b) internal pure returns (uint256 c) {
      // to avoid overflow, a <= (type(uint256).max - HALF_RAY) / b
      assembly {
-@@ -704,7 +704,7 @@ library WadRayMath {
+@@ -704,7 +691,7 @@ library WadRayMath {
     * @param a Ray
     * @param b Ray
     * @return c = a raydiv b
@@ -87,7 +136,7 @@ index 9195c28..1b84ad9 100644
    function rayDiv(uint256 a, uint256 b) internal pure returns (uint256 c) {
      // to avoid overflow, a <= (type(uint256).max - halfB) / RAY
      assembly {
-@@ -721,7 +721,7 @@ library WadRayMath {
+@@ -721,7 +708,7 @@ library WadRayMath {
     * @dev assembly optimized for improved gas savings, see https://twitter.com/transmissions11/status/1451131036377571328
     * @param a Ray
     * @return b = a converted to wad, rounded half up to the nearest wad
@@ -96,7 +145,7 @@ index 9195c28..1b84ad9 100644
    function rayToWad(uint256 a) internal pure returns (uint256 b) {
      assembly {
        b := div(a, WAD_RAY_RATIO)
-@@ -737,7 +737,7 @@ library WadRayMath {
+@@ -737,7 +724,7 @@ library WadRayMath {
     * @dev assembly optimized for improved gas savings, see https://twitter.com/transmissions11/status/1451131036377571328
     * @param a Wad
     * @return b = a converted in ray
@@ -105,7 +154,7 @@ index 9195c28..1b84ad9 100644
    function wadToRay(uint256 a) internal pure returns (uint256 b) {
      // to avoid overflow, b/WAD_RAY_RATIO == a
      assembly {
-@@ -754,7 +754,7 @@ library WadRayMath {
+@@ -754,7 +741,7 @@ library WadRayMath {
   * @title IPoolAddressesProvider
   * @author Aave
   * @notice Defines the basic interface for a Pool Addresses Provider.
@@ -114,7 +163,7 @@ index 9195c28..1b84ad9 100644
  interface IPoolAddressesProvider {
    /**
     * @dev Emitted when the market identifier is updated.
-@@ -849,7 +849,7 @@ interface IPoolAddressesProvider {
+@@ -849,7 +836,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Returns the id of the Aave market to which this contract points to.
     * @return The market id
@@ -123,7 +172,7 @@ index 9195c28..1b84ad9 100644
    function getMarketId() external view returns (string memory);
  
    /**
-@@ -891,27 +891,27 @@ interface IPoolAddressesProvider {
+@@ -891,27 +878,27 @@ interface IPoolAddressesProvider {
    /**
     * @notice Returns the address of the Pool proxy.
     * @return The Pool proxy address
@@ -155,7 +204,7 @@ index 9195c28..1b84ad9 100644
    function setPoolConfiguratorImpl(address newPoolConfiguratorImpl) external;
  
    /**
-@@ -935,7 +935,7 @@ interface IPoolAddressesProvider {
+@@ -935,7 +922,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the ACL manager.
     * @param newAclManager The address of the new ACLManager
@@ -164,7 +213,7 @@ index 9195c28..1b84ad9 100644
    function setACLManager(address newAclManager) external;
  
    /**
-@@ -959,7 +959,7 @@ interface IPoolAddressesProvider {
+@@ -959,7 +946,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the price oracle sentinel.
     * @param newPriceOracleSentinel The address of the new PriceOracleSentinel
@@ -173,7 +222,7 @@ index 9195c28..1b84ad9 100644
    function setPriceOracleSentinel(address newPriceOracleSentinel) external;
  
    /**
-@@ -971,7 +971,7 @@ interface IPoolAddressesProvider {
+@@ -971,7 +958,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the data provider.
     * @param newDataProvider The address of the new DataProvider
@@ -182,7 +231,20 @@ index 9195c28..1b84ad9 100644
    function setPoolDataProvider(address newDataProvider) external;
  }
  
-@@ -1245,7 +1245,7 @@ library DataTypes {
+@@ -1052,11 +1039,7 @@ library DataTypes {
+     string label;
+   }
+ 
+-  enum InterestRateMode {
+-    NONE,
+-    STABLE,
+-    VARIABLE
+-  }
++  enum InterestRateMode {NONE, STABLE, VARIABLE}
+ 
+   struct ReserveCache {
+     uint256 currScaledVariableDebt;
+@@ -1245,7 +1228,7 @@ library DataTypes {
   * @title IPool
   * @author Aave
   * @notice Defines the basic interface for an Aave Pool.
@@ -191,7 +253,7 @@ index 9195c28..1b84ad9 100644
  interface IPool {
    /**
     * @dev Emitted on mintUnbacked()
-@@ -1254,7 +1254,7 @@ interface IPool {
+@@ -1254,7 +1237,7 @@ interface IPool {
     * @param onBehalfOf The beneficiary of the supplied assets, receiving the aTokens
     * @param amount The amount of supplied assets
     * @param referralCode The referral code used
@@ -200,7 +262,7 @@ index 9195c28..1b84ad9 100644
    event MintUnbacked(
      address indexed reserve,
      address user,
-@@ -1269,7 +1269,7 @@ interface IPool {
+@@ -1269,7 +1252,7 @@ interface IPool {
     * @param backer The address paying for the backing
     * @param amount The amount added as backing
     * @param fee The amount paid in fees
@@ -209,7 +271,7 @@ index 9195c28..1b84ad9 100644
    event BackUnbacked(address indexed reserve, address indexed backer, uint256 amount, uint256 fee);
  
    /**
-@@ -1279,7 +1279,7 @@ interface IPool {
+@@ -1279,7 +1262,7 @@ interface IPool {
     * @param onBehalfOf The beneficiary of the supply, receiving the aTokens
     * @param amount The amount supplied
     * @param referralCode The referral code used
@@ -218,7 +280,7 @@ index 9195c28..1b84ad9 100644
    event Supply(
      address indexed reserve,
      address user,
-@@ -1294,7 +1294,7 @@ interface IPool {
+@@ -1294,7 +1277,7 @@ interface IPool {
     * @param user The address initiating the withdrawal, owner of aTokens
     * @param to The address that will receive the underlying
     * @param amount The amount to be withdrawn
@@ -227,7 +289,7 @@ index 9195c28..1b84ad9 100644
    event Withdraw(address indexed reserve, address indexed user, address indexed to, uint256 amount);
  
    /**
-@@ -1307,7 +1307,7 @@ interface IPool {
+@@ -1307,7 +1290,7 @@ interface IPool {
     * @param interestRateMode The rate mode: 1 for Stable, 2 for Variable
     * @param borrowRate The numeric rate at which the user has borrowed, expressed in ray
     * @param referralCode The referral code used
@@ -236,7 +298,7 @@ index 9195c28..1b84ad9 100644
    event Borrow(
      address indexed reserve,
      address user,
-@@ -1325,7 +1325,7 @@ interface IPool {
+@@ -1325,7 +1308,7 @@ interface IPool {
     * @param repayer The address of the user initiating the repay(), providing the funds
     * @param amount The amount repaid
     * @param useATokens True if the repayment is done using aTokens, `false` if done with underlying asset directly
@@ -245,7 +307,7 @@ index 9195c28..1b84ad9 100644
    event Repay(
      address indexed reserve,
      address indexed user,
-@@ -1339,7 +1339,7 @@ interface IPool {
+@@ -1339,7 +1322,7 @@ interface IPool {
     * @param reserve The address of the underlying asset of the reserve
     * @param user The address of the user swapping his rate mode
     * @param interestRateMode The current interest rate mode of the position being swapped: 1 for Stable, 2 for Variable
@@ -254,7 +316,7 @@ index 9195c28..1b84ad9 100644
    event SwapBorrowRateMode(
      address indexed reserve,
      address indexed user,
-@@ -1357,28 +1357,28 @@ interface IPool {
+@@ -1357,28 +1340,28 @@ interface IPool {
     * @dev Emitted when the user selects a certain asset category for eMode
     * @param user The address of the user
     * @param categoryId The category id
@@ -287,7 +349,7 @@ index 9195c28..1b84ad9 100644
    event RebalanceStableBorrowRate(address indexed reserve, address indexed user);
  
    /**
-@@ -1390,7 +1390,7 @@ interface IPool {
+@@ -1390,7 +1373,7 @@ interface IPool {
     * @param interestRateMode The flashloan mode: 0 for regular flashloan, 1 for Stable debt, 2 for Variable debt
     * @param premium The fee flash borrowed
     * @param referralCode The referral code used
@@ -296,7 +358,7 @@ index 9195c28..1b84ad9 100644
    event FlashLoan(
      address indexed target,
      address initiator,
-@@ -1411,7 +1411,7 @@ interface IPool {
+@@ -1411,7 +1394,7 @@ interface IPool {
     * @param liquidator The address of the liquidator
     * @param receiveAToken True if the liquidators wants to receive the collateral aTokens, `false` if he wants
     * to receive the underlying collateral asset directly
@@ -305,7 +367,7 @@ index 9195c28..1b84ad9 100644
    event LiquidationCall(
      address indexed collateralAsset,
      address indexed debtAsset,
-@@ -1430,7 +1430,7 @@ interface IPool {
+@@ -1430,7 +1413,7 @@ interface IPool {
     * @param variableBorrowRate The next variable borrow rate
     * @param liquidityIndex The next liquidity index
     * @param variableBorrowIndex The next variable borrow index
@@ -314,7 +376,7 @@ index 9195c28..1b84ad9 100644
    event ReserveDataUpdated(
      address indexed reserve,
      uint256 liquidityRate,
-@@ -1444,17 +1444,17 @@ interface IPool {
+@@ -1444,17 +1427,17 @@ interface IPool {
     * @dev Emitted when the protocol treasury receives minted aTokens from the accrued interest.
     * @param reserve The address of the reserve
     * @param amountMinted The amount minted to the treasury
@@ -335,7 +397,7 @@ index 9195c28..1b84ad9 100644
    function mintUnbacked(
      address asset,
      uint256 amount,
-@@ -1463,16 +1463,17 @@ interface IPool {
+@@ -1463,16 +1446,13 @@ interface IPool {
    ) external;
  
    /**
@@ -345,27 +407,34 @@ index 9195c28..1b84ad9 100644
     * @param amount The amount to back
     * @param fee The amount paid in fees
 -   **/
+-  function backUnbacked(
+-    address asset,
+-    uint256 amount,
+-    uint256 fee
+-  ) external;
 +   * @return The backed amount
 +   */
-   function backUnbacked(
-     address asset,
-     uint256 amount,
-     uint256 fee
--  ) external;
-+  ) external returns (uint256);
++  function backUnbacked(address asset, uint256 amount, uint256 fee) external returns (uint256);
  
    /**
     * @notice Supplies an `amount` of underlying asset into the reserve, receiving in return overlying aTokens.
-@@ -1484,7 +1485,7 @@ interface IPool {
+@@ -1484,13 +1464,8 @@ interface IPool {
     *   is a different wallet
     * @param referralCode Code used to register the integrator originating the operation, for potential rewards.
     *   0 if the action is executed directly by the user, without any middle-man
 -   **/
+-  function supply(
+-    address asset,
+-    uint256 amount,
+-    address onBehalfOf,
+-    uint16 referralCode
+-  ) external;
 +   */
-   function supply(
-     address asset,
-     uint256 amount,
-@@ -1506,7 +1507,7 @@ interface IPool {
++  function supply(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external;
+ 
+   /**
+    * @notice Supply with transfer approval of asset to be supplied done via permit function
+@@ -1506,7 +1481,7 @@ interface IPool {
     * @param permitV The V parameter of ERC712 permit sig
     * @param permitR The R parameter of ERC712 permit sig
     * @param permitS The S parameter of ERC712 permit sig
@@ -374,16 +443,22 @@ index 9195c28..1b84ad9 100644
    function supplyWithPermit(
      address asset,
      uint256 amount,
-@@ -1528,7 +1529,7 @@ interface IPool {
+@@ -1528,12 +1503,8 @@ interface IPool {
     *   wants to receive it on his own wallet, or a different address if the beneficiary is a
     *   different wallet
     * @return The final amount withdrawn
 -   **/
+-  function withdraw(
+-    address asset,
+-    uint256 amount,
+-    address to
+-  ) external returns (uint256);
 +   */
-   function withdraw(
-     address asset,
-     uint256 amount,
-@@ -1549,7 +1550,7 @@ interface IPool {
++  function withdraw(address asset, uint256 amount, address to) external returns (uint256);
+ 
+   /**
+    * @notice Allows users to borrow a specific `amount` of the reserve underlying asset, provided that the borrower
+@@ -1549,7 +1520,7 @@ interface IPool {
     * @param onBehalfOf The address of the user who will receive the debt. Should be the address of the borrower itself
     * calling the function if he wants to borrow against his own collateral, or the address of the credit delegator
     * if he has been given credit delegation allowance
@@ -392,7 +467,7 @@ index 9195c28..1b84ad9 100644
    function borrow(
      address asset,
      uint256 amount,
-@@ -1569,7 +1570,7 @@ interface IPool {
+@@ -1569,7 +1540,7 @@ interface IPool {
     * user calling the function if he wants to reduce/remove his own debt, or the address of any other
     * other borrower whose debt should be removed
     * @return The final amount repaid
@@ -401,7 +476,7 @@ index 9195c28..1b84ad9 100644
    function repay(
      address asset,
      uint256 amount,
-@@ -1592,7 +1593,7 @@ interface IPool {
+@@ -1592,7 +1563,7 @@ interface IPool {
     * @param permitR The R parameter of ERC712 permit sig
     * @param permitS The S parameter of ERC712 permit sig
     * @return The final amount repaid
@@ -410,7 +485,7 @@ index 9195c28..1b84ad9 100644
    function repayWithPermit(
      address asset,
      uint256 amount,
-@@ -1615,7 +1616,7 @@ interface IPool {
+@@ -1615,7 +1586,7 @@ interface IPool {
     * - Send the value type(uint256).max in order to repay the whole debt for `asset` on the specific `debtMode`
     * @param interestRateMode The interest rate mode at of the debt the user wants to repay: 1 for Stable, 2 for Variable
     * @return The final amount repaid
@@ -419,7 +494,7 @@ index 9195c28..1b84ad9 100644
    function repayWithATokens(
      address asset,
      uint256 amount,
-@@ -1626,7 +1627,7 @@ interface IPool {
+@@ -1626,7 +1597,7 @@ interface IPool {
     * @notice Allows a borrower to swap his debt between stable and variable mode, or vice versa
     * @param asset The address of the underlying asset borrowed
     * @param interestRateMode The current interest rate mode of the position being swapped: 1 for Stable, 2 for Variable
@@ -428,7 +503,7 @@ index 9195c28..1b84ad9 100644
    function swapBorrowRateMode(address asset, uint256 interestRateMode) external;
  
    /**
-@@ -1637,14 +1638,14 @@ interface IPool {
+@@ -1637,14 +1608,14 @@ interface IPool {
     *        much has been borrowed at a stable rate and suppliers are not earning enough
     * @param asset The address of the underlying asset borrowed
     * @param user The address of the user to be rebalanced
@@ -445,7 +520,7 @@ index 9195c28..1b84ad9 100644
    function setUserUseReserveAsCollateral(address asset, bool useAsCollateral) external;
  
    /**
-@@ -1657,7 +1658,7 @@ interface IPool {
+@@ -1657,7 +1628,7 @@ interface IPool {
     * @param debtToCover The debt amount of borrowed `asset` the liquidator wants to cover
     * @param receiveAToken True if the liquidators wants to receive the collateral aTokens, `false` if he wants
     * to receive the underlying collateral asset directly
@@ -454,7 +529,16 @@ index 9195c28..1b84ad9 100644
    function liquidationCall(
      address collateralAsset,
      address debtAsset,
-@@ -1682,7 +1683,7 @@ interface IPool {
+@@ -1670,7 +1641,7 @@ interface IPool {
+    * @notice Allows smartcontracts to access the liquidity of the pool within one transaction,
+    * as long as the amount taken plus a fee is returned.
+    * @dev IMPORTANT There are security concerns for developers of flashloan receiver contracts that must be kept
+-   * into consideration. For further details please visit https://developers.aave.com
++   * into consideration. For further details please visit https://docs.aave.com/developers/
+    * @param receiverAddress The address of the contract receiving the funds, implementing IFlashLoanReceiver interface
+    * @param assets The addresses of the assets being flash-borrowed
+    * @param amounts The amounts of the assets being flash-borrowed
+@@ -1682,7 +1653,7 @@ interface IPool {
     * @param params Variadic packed params to pass to the receiver as extra information
     * @param referralCode The code used to register the integrator originating the operation, for potential rewards.
     *   0 if the action is executed directly by the user, without any middle-man
@@ -463,7 +547,15 @@ index 9195c28..1b84ad9 100644
    function flashLoan(
      address receiverAddress,
      address[] calldata assets,
-@@ -1704,7 +1705,7 @@ interface IPool {
+@@ -1697,14 +1668,14 @@ interface IPool {
+    * @notice Allows smartcontracts to access the liquidity of the pool within one transaction,
+    * as long as the amount taken plus a fee is returned.
+    * @dev IMPORTANT There are security concerns for developers of flashloan receiver contracts that must be kept
+-   * into consideration. For further details please visit https://developers.aave.com
++   * into consideration. For further details please visit https://docs.aave.com/developers/
+    * @param receiverAddress The address of the contract receiving the funds, implementing IFlashLoanSimpleReceiver interface
+    * @param asset The address of the asset being flash-borrowed
+    * @param amount The amount of the asset being flash-borrowed
     * @param params Variadic packed params to pass to the receiver as extra information
     * @param referralCode The code used to register the integrator originating the operation, for potential rewards.
     *   0 if the action is executed directly by the user, without any middle-man
@@ -472,16 +564,20 @@ index 9195c28..1b84ad9 100644
    function flashLoanSimple(
      address receiverAddress,
      address asset,
-@@ -1722,7 +1723,7 @@ interface IPool {
+@@ -1722,8 +1693,10 @@ interface IPool {
     * @return currentLiquidationThreshold The liquidation threshold of the user
     * @return ltv The loan to value of The user
     * @return healthFactor The current health factor of the user
 -   **/
+-  function getUserAccountData(address user)
 +   */
-   function getUserAccountData(address user)
++  function getUserAccountData(
++    address user
++  )
      external
      view
-@@ -1744,7 +1745,7 @@ interface IPool {
+     returns (
+@@ -1744,7 +1717,7 @@ interface IPool {
     * @param stableDebtAddress The address of the StableDebtToken that will be assigned to the reserve
     * @param variableDebtAddress The address of the VariableDebtToken that will be assigned to the reserve
     * @param interestRateStrategyAddress The address of the interest rate strategy contract
@@ -490,7 +586,7 @@ index 9195c28..1b84ad9 100644
    function initReserve(
      address asset,
      address aTokenAddress,
-@@ -1757,7 +1758,7 @@ interface IPool {
+@@ -1757,7 +1730,7 @@ interface IPool {
     * @notice Drop a reserve
     * @dev Only callable by the PoolConfigurator contract
     * @param asset The address of the underlying asset of the reserve
@@ -499,43 +595,60 @@ index 9195c28..1b84ad9 100644
    function dropReserve(address asset) external;
  
    /**
-@@ -1765,7 +1766,7 @@ interface IPool {
+@@ -1765,41 +1738,43 @@ interface IPool {
     * @dev Only callable by the PoolConfigurator contract
     * @param asset The address of the underlying asset of the reserve
     * @param rateStrategyAddress The address of the interest rate strategy contract
 -   **/
+-  function setReserveInterestRateStrategyAddress(address asset, address rateStrategyAddress)
+-    external;
 +   */
-   function setReserveInterestRateStrategyAddress(address asset, address rateStrategyAddress)
-     external;
++  function setReserveInterestRateStrategyAddress(
++    address asset,
++    address rateStrategyAddress
++  ) external;
  
-@@ -1774,7 +1775,7 @@ interface IPool {
+   /**
+    * @notice Sets the configuration bitmap of the reserve as a whole
     * @dev Only callable by the PoolConfigurator contract
     * @param asset The address of the underlying asset of the reserve
     * @param configuration The new configuration bitmap
 -   **/
+-  function setConfiguration(address asset, DataTypes.ReserveConfigurationMap calldata configuration)
+-    external;
 +   */
-   function setConfiguration(address asset, DataTypes.ReserveConfigurationMap calldata configuration)
-     external;
++  function setConfiguration(
++    address asset,
++    DataTypes.ReserveConfigurationMap calldata configuration
++  ) external;
  
-@@ -1782,7 +1783,7 @@ interface IPool {
+   /**
     * @notice Returns the configuration of the reserve
     * @param asset The address of the underlying asset of the reserve
     * @return The configuration of the reserve
 -   **/
+-  function getConfiguration(address asset)
+-    external
+-    view
+-    returns (DataTypes.ReserveConfigurationMap memory);
 +   */
-   function getConfiguration(address asset)
-     external
-     view
-@@ -1792,14 +1793,14 @@ interface IPool {
++  function getConfiguration(
++    address asset
++  ) external view returns (DataTypes.ReserveConfigurationMap memory);
+ 
+   /**
     * @notice Returns the configuration of the user across all the reserves
     * @param user The user address
     * @return The configuration of the user
 -   **/
+-  function getUserConfiguration(address user)
+-    external
+-    view
+-    returns (DataTypes.UserConfigurationMap memory);
 +   */
-   function getUserConfiguration(address user)
-     external
-     view
-     returns (DataTypes.UserConfigurationMap memory);
++  function getUserConfiguration(
++    address user
++  ) external view returns (DataTypes.UserConfigurationMap memory);
  
    /**
 -   * @notice Returns the normalized income normalized income of the reserve
@@ -543,7 +656,7 @@ index 9195c28..1b84ad9 100644
     * @param asset The address of the underlying asset of the reserve
     * @return The reserve's normalized income
     */
-@@ -1807,6 +1808,13 @@ interface IPool {
+@@ -1807,6 +1782,13 @@ interface IPool {
  
    /**
     * @notice Returns the normalized variable debt per unit of asset
@@ -557,7 +670,7 @@ index 9195c28..1b84ad9 100644
     * @param asset The address of the underlying asset of the reserve
     * @return The reserve normalized variable debt
     */
-@@ -1816,7 +1824,7 @@ interface IPool {
+@@ -1816,7 +1798,7 @@ interface IPool {
     * @notice Returns the state and configuration of the reserve
     * @param asset The address of the underlying asset of the reserve
     * @return The state and configuration data of the reserve
@@ -566,7 +679,7 @@ index 9195c28..1b84ad9 100644
    function getReserveData(address asset) external view returns (DataTypes.ReserveData memory);
  
    /**
-@@ -1842,20 +1850,20 @@ interface IPool {
+@@ -1842,20 +1824,20 @@ interface IPool {
     * @notice Returns the list of the underlying assets of all the initialized reserves
     * @dev It does not include dropped reserves
     * @return The addresses of the underlying assets of the initialized reserves
@@ -590,7 +703,7 @@ index 9195c28..1b84ad9 100644
    function ADDRESSES_PROVIDER() external view returns (IPoolAddressesProvider);
  
    /**
-@@ -1948,7 +1956,7 @@ interface IPool {
+@@ -1948,7 +1930,7 @@ interface IPool {
    /**
     * @notice Mints the assets accrued through the reserve factor to the treasury in the form of aTokens
     * @param assets The list of reserves for which the minting needs to be executed
@@ -599,16 +712,34 @@ index 9195c28..1b84ad9 100644
    function mintToTreasury(address[] calldata assets) external;
  
    /**
-@@ -1974,7 +1982,7 @@ interface IPool {
+@@ -1957,11 +1939,7 @@ interface IPool {
+    * @param to The address of the recipient
+    * @param amount The amount of token to transfer
+    */
+-  function rescueTokens(
+-    address token,
+-    address to,
+-    uint256 amount
+-  ) external;
++  function rescueTokens(address token, address to, uint256 amount) external;
+ 
+   /**
+    * @notice Supplies an `amount` of underlying asset into the reserve, receiving in return overlying aTokens.
+@@ -1974,29 +1952,24 @@ interface IPool {
     *   is a different wallet
     * @param referralCode Code used to register the integrator originating the operation, for potential rewards.
     *   0 if the action is executed directly by the user, without any middle-man
 -   **/
+-  function deposit(
+-    address asset,
+-    uint256 amount,
+-    address onBehalfOf,
+-    uint16 referralCode
+-  ) external;
 +   */
-   function deposit(
-     address asset,
-     uint256 amount,
-@@ -1986,17 +1994,17 @@ interface IPool {
++  function deposit(address asset, uint256 amount, address onBehalfOf, uint16 referralCode) external;
+ }
+ 
  /**
   * @title IScaledBalanceToken
   * @author Aave
@@ -632,7 +763,7 @@ index 9195c28..1b84ad9 100644
    event Mint(
      address indexed caller,
      address indexed onBehalfOf,
-@@ -2006,13 +2014,14 @@ interface IScaledBalanceToken {
+@@ -2006,13 +1979,14 @@ interface IScaledBalanceToken {
    );
  
    /**
@@ -652,7 +783,7 @@ index 9195c28..1b84ad9 100644
    event Burn(
      address indexed from,
      address indexed target,
-@@ -2027,7 +2036,7 @@ interface IScaledBalanceToken {
+@@ -2027,7 +2001,7 @@ interface IScaledBalanceToken {
     * at the moment of the update
     * @param user The user whose balance is calculated
     * @return The scaled balance of the user
@@ -661,7 +792,7 @@ index 9195c28..1b84ad9 100644
    function scaledBalanceOf(address user) external view returns (uint256);
  
    /**
-@@ -2035,20 +2044,20 @@ interface IScaledBalanceToken {
+@@ -2035,20 +2009,20 @@ interface IScaledBalanceToken {
     * @param user The address of the user
     * @return The scaled balance of the user
     * @return The scaled total supply
@@ -685,7 +816,7 @@ index 9195c28..1b84ad9 100644
    function getPreviousIndex(address user) external view returns (uint256);
  }
  
-@@ -2056,181 +2065,28 @@ interface IScaledBalanceToken {
+@@ -2056,181 +2030,24 @@ interface IScaledBalanceToken {
   * @title IAaveIncentivesController
   * @author Aave
   * @notice Defines the basic interface for an Aave Incentives Controller.
@@ -787,7 +918,7 @@ index 9195c28..1b84ad9 100644
 -   * @param userBalance The balance of the user of the asset in the pool
 -   * @param totalSupply The total supply of the asset in the pool
 -   **/
-   function handleAction(
+-  function handleAction(
 -    address asset,
 -    uint256 userBalance,
 -    uint256 totalSupply
@@ -829,7 +960,7 @@ index 9195c28..1b84ad9 100644
 -  function claimRewardsOnBehalf(
 -    address[] calldata assets,
 -    uint256 amount,
-     address user,
+-    address user,
 -    address to
 -  ) external returns (uint256);
 -
@@ -864,9 +995,7 @@ index 9195c28..1b84ad9 100644
 -   * @dev Gets the distribution end timestamp of the emissions
 -   */
 -  function DISTRIBUTION_END() external view returns (uint256);
-+    uint256 totalSupply,
-+    uint256 userBalance
-+  ) external;
++  function handleAction(address user, uint256 totalSupply, uint256 userBalance) external;
  }
  
  /**
@@ -878,7 +1007,7 @@ index 9195c28..1b84ad9 100644
  interface IInitializableAToken {
    /**
     * @dev Emitted when an aToken is initialized
-@@ -2242,7 +2098,7 @@ interface IInitializableAToken {
+@@ -2242,7 +2059,7 @@ interface IInitializableAToken {
     * @param aTokenName The name of the aToken
     * @param aTokenSymbol The symbol of the aToken
     * @param params A set of encoded parameters for additional initialization
@@ -887,7 +1016,7 @@ index 9195c28..1b84ad9 100644
    event Initialized(
      address indexed underlyingAsset,
      address indexed pool,
-@@ -2281,15 +2137,15 @@ interface IInitializableAToken {
+@@ -2281,15 +2098,15 @@ interface IInitializableAToken {
   * @title IAToken
   * @author Aave
   * @notice Defines the basic interface for an AToken.
@@ -906,25 +1035,35 @@ index 9195c28..1b84ad9 100644
    event BalanceTransfer(address indexed from, address indexed to, uint256 value, uint256 index);
  
    /**
-@@ -2315,7 +2171,7 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+@@ -2315,13 +2132,8 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     * @param receiverOfUnderlying The address that will receive the underlying
     * @param amount The amount being burned
     * @param index The next liquidity index of the reserve
 -   **/
+-  function burn(
+-    address from,
+-    address receiverOfUnderlying,
+-    uint256 amount,
+-    uint256 index
+-  ) external;
 +   */
-   function burn(
-     address from,
-     address receiverOfUnderlying,
-@@ -2335,7 +2191,7 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
++  function burn(address from, address receiverOfUnderlying, uint256 amount, uint256 index) external;
+ 
+   /**
+    * @notice Mints aTokens to the reserve treasury
+@@ -2335,20 +2147,16 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     * @param from The address getting liquidated, current owner of the aTokens
     * @param to The recipient
     * @param value The amount of tokens getting transferred
 -   **/
+-  function transferOnLiquidation(
+-    address from,
+-    address to,
+-    uint256 value
+-  ) external;
 +   */
-   function transferOnLiquidation(
-     address from,
-     address to,
-@@ -2345,10 +2201,10 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
++  function transferOnLiquidation(address from, address to, uint256 value) external;
+ 
    /**
     * @notice Transfers the underlying asset to `target`.
     * @dev Used by the Pool to transfer assets in borrow(), withdraw() and flashLoan()
@@ -938,7 +1077,7 @@ index 9195c28..1b84ad9 100644
  
    /**
     * @notice Handles the underlying received by the aToken after the transfer has been completed.
-@@ -2356,9 +2212,14 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+@@ -2356,9 +2164,10 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     * transfer is concluded. However in the future there may be aTokens that allow for example to stake the underlying
     * to receive LM rewards. In that case, `handleRepayment()` would perform the staking of the underlying asset.
     * @param user The user executing the repayment
@@ -947,15 +1086,11 @@ index 9195c28..1b84ad9 100644
 -   **/
 -  function handleRepayment(address user, uint256 amount) external;
 +   */
-+  function handleRepayment(
-+    address user,
-+    address onBehalfOf,
-+    uint256 amount
-+  ) external;
++  function handleRepayment(address user, address onBehalfOf, uint256 amount) external;
  
    /**
     * @notice Allow passing a signed message to approve spending
-@@ -2385,13 +2246,13 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+@@ -2385,13 +2194,13 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
    /**
     * @notice Returns the address of the underlying asset of this aToken (E.g. WETH for aWETH)
     * @return The address of the underlying asset
@@ -971,7 +1106,7 @@ index 9195c28..1b84ad9 100644
    function RESERVE_TREASURY_ADDRESS() external view returns (address);
  
    /**
-@@ -2405,7 +2266,7 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+@@ -2405,7 +2214,7 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
     * @notice Returns the nonce for owner.
     * @param owner The address of the owner
     * @return The nonce of the owner
@@ -980,7 +1115,20 @@ index 9195c28..1b84ad9 100644
    function nonces(address owner) external view returns (uint256);
  
    /**
-@@ -2454,7 +2315,7 @@ interface IERC20Detailed is IERC20 {
+@@ -2414,11 +2223,7 @@ interface IAToken is IERC20, IScaledBalanceToken, IInitializableAToken {
+    * @param to The address of the recipient
+    * @param amount The amount of token to transfer
+    */
+-  function rescueTokens(
+-    address token,
+-    address to,
+-    uint256 amount
+-  ) external;
++  function rescueTokens(address token, address to, uint256 amount) external;
+ }
+ 
+ /*
+@@ -2454,7 +2259,7 @@ interface IERC20Detailed is IERC20 {
   * @title IACLManager
   * @author Aave
   * @notice Defines the basic interface for the ACL Manager
@@ -989,7 +1137,7 @@ index 9195c28..1b84ad9 100644
  interface IACLManager {
    /**
     * @notice Returns the contract address of the PoolAddressesProvider
-@@ -2570,7 +2431,7 @@ interface IACLManager {
+@@ -2570,7 +2375,7 @@ interface IACLManager {
    function addFlashBorrower(address borrower) external;
  
    /**
@@ -998,7 +1146,7 @@ index 9195c28..1b84ad9 100644
     * @param borrower The address of the FlashBorrower to remove
     */
    function removeFlashBorrower(address borrower) external;
-@@ -2625,14 +2486,14 @@ interface IACLManager {
+@@ -2625,14 +2430,14 @@ interface IACLManager {
   * @title IncentivizedERC20
   * @author Aave, inspired by the Openzeppelin ERC20 implementation
   * @notice Basic ERC20 implementation
@@ -1015,7 +1163,7 @@ index 9195c28..1b84ad9 100644
    modifier onlyPoolAdmin() {
      IACLManager aclManager = IACLManager(_addressesProvider.getACLManager());
      require(aclManager.isPoolAdmin(msg.sender), Errors.CALLER_NOT_POOL_ADMIN);
-@@ -2641,7 +2502,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2641,7 +2446,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
  
    /**
     * @dev Only pool can call functions marked by this modifier.
@@ -1024,7 +1172,21 @@ index 9195c28..1b84ad9 100644
    modifier onlyPool() {
      require(_msgSender() == address(POOL), Errors.CALLER_MUST_BE_POOL);
      _;
-@@ -2719,7 +2580,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2678,12 +2483,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+    * @param symbol The symbol of the token
+    * @param decimals The number of decimals of the token
+    */
+-  constructor(
+-    IPool pool,
+-    string memory name,
+-    string memory symbol,
+-    uint8 decimals
+-  ) {
++  constructor(IPool pool, string memory name, string memory symbol, uint8 decimals) {
+     _addressesProvider = pool.ADDRESSES_PROVIDER();
+     _name = name;
+     _symbol = symbol;
+@@ -2719,7 +2519,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
    /**
     * @notice Returns the address of the Incentives Controller contract
     * @return The address of the Incentives Controller
@@ -1033,7 +1195,7 @@ index 9195c28..1b84ad9 100644
    function getIncentivesController() external view virtual returns (IAaveIncentivesController) {
      return _incentivesController;
    }
-@@ -2727,7 +2588,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2727,7 +2527,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
    /**
     * @notice Sets a new Incentives Controller
     * @param controller the new Incentives controller
@@ -1042,7 +1204,25 @@ index 9195c28..1b84ad9 100644
    function setIncentivesController(IAaveIncentivesController controller) external onlyPoolAdmin {
      _incentivesController = controller;
    }
-@@ -2773,7 +2634,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2740,13 +2540,10 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+   }
+ 
+   /// @inheritdoc IERC20
+-  function allowance(address owner, address spender)
+-    external
+-    view
+-    virtual
+-    override
+-    returns (uint256)
+-  {
++  function allowance(
++    address owner,
++    address spender
++  ) external view virtual override returns (uint256) {
+     return _allowances[owner][spender];
+   }
+ 
+@@ -2773,7 +2570,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
     * @param spender The user allowed to spend on behalf of _msgSender()
     * @param addedValue The amount being added to the allowance
     * @return `true`
@@ -1051,16 +1231,38 @@ index 9195c28..1b84ad9 100644
    function increaseAllowance(address spender, uint256 addedValue) external virtual returns (bool) {
      _approve(_msgSender(), spender, _allowances[_msgSender()][spender] + addedValue);
      return true;
-@@ -2784,7 +2645,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2784,12 +2581,11 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
     * @param spender The user allowed to spend on behalf of _msgSender()
     * @param subtractedValue The amount being subtracted to the allowance
     * @return `true`
 -   **/
+-  function decreaseAllowance(address spender, uint256 subtractedValue)
+-    external
+-    virtual
+-    returns (bool)
+-  {
 +   */
-   function decreaseAllowance(address spender, uint256 subtractedValue)
-     external
-     virtual
-@@ -2818,7 +2679,6 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
++  function decreaseAllowance(
++    address spender,
++    uint256 subtractedValue
++  ) external virtual returns (bool) {
+     _approve(_msgSender(), spender, _allowances[_msgSender()][spender] - subtractedValue);
+     return true;
+   }
+@@ -2800,11 +2596,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+    * @param recipient The destination address
+    * @param amount The amount getting transferred
+    */
+-  function _transfer(
+-    address sender,
+-    address recipient,
+-    uint128 amount
+-  ) internal virtual {
++  function _transfer(address sender, address recipient, uint128 amount) internal virtual {
+     uint128 oldSenderBalance = _userState[sender].balance;
+     _userState[sender].balance = oldSenderBalance - amount;
+     uint128 oldRecipientBalance = _userState[recipient].balance;
+@@ -2818,7 +2610,6 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
          incentivesControllerLocal.handleAction(recipient, currentTotalSupply, oldRecipientBalance);
        }
      }
@@ -1068,7 +1270,20 @@ index 9195c28..1b84ad9 100644
    }
  
    /**
-@@ -2865,7 +2725,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+@@ -2827,11 +2618,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
+    * @param spender The address approved for spending
+    * @param amount The amount of tokens to approve spending of
+    */
+-  function _approve(
+-    address owner,
+-    address spender,
+-    uint256 amount
+-  ) internal virtual {
++  function _approve(address owner, address spender, uint256 amount) internal virtual {
+     _allowances[owner][spender] = amount;
+     emit Approval(owner, spender, amount);
+   }
+@@ -2865,7 +2652,7 @@ abstract contract IncentivizedERC20 is Context, IERC20Detailed {
   * @title MintableIncentivizedERC20
   * @author Aave
   * @notice Implements mint and burn functions for IncentivizedERC20
@@ -1077,7 +1292,7 @@ index 9195c28..1b84ad9 100644
  abstract contract MintableIncentivizedERC20 is IncentivizedERC20 {
    /**
     * @dev Constructor.
-@@ -2925,7 +2785,7 @@ abstract contract MintableIncentivizedERC20 is IncentivizedERC20 {
+@@ -2925,7 +2712,7 @@ abstract contract MintableIncentivizedERC20 is IncentivizedERC20 {
   * @title ScaledBalanceTokenBase
   * @author Aave
   * @notice Basic ERC20 implementation of scaled balance token
@@ -1086,7 +1301,23 @@ index 9195c28..1b84ad9 100644
  abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBalanceToken {
    using WadRayMath for uint256;
    using SafeCast for uint256;
-@@ -2978,7 +2838,7 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
+@@ -2952,12 +2739,9 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
+   }
+ 
+   /// @inheritdoc IScaledBalanceToken
+-  function getScaledUserBalanceAndSupply(address user)
+-    external
+-    view
+-    override
+-    returns (uint256, uint256)
+-  {
++  function getScaledUserBalanceAndSupply(
++    address user
++  ) external view override returns (uint256, uint256) {
+     return (super.balanceOf(user), super.totalSupply());
+   }
+ 
+@@ -2978,7 +2762,7 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
     * @param amount The amount of tokens getting minted
     * @param index The next liquidity index of the reserve
     * @return `true` if the the previous balance of the user was 0
@@ -1095,7 +1326,7 @@ index 9195c28..1b84ad9 100644
    function _mintScaled(
      address caller,
      address onBehalfOf,
-@@ -3008,9 +2868,10 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
+@@ -3008,15 +2792,11 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
     * @dev In some instances, a burn transaction will emit a mint event
     * if the amount to burn is less than the interest that the user accrued
     * @param user The user which debt is burnt
@@ -1103,11 +1334,18 @@ index 9195c28..1b84ad9 100644
     * @param amount The amount getting burned
     * @param index The variable debt index of the reserve
 -   **/
+-  function _burnScaled(
+-    address user,
+-    address target,
+-    uint256 amount,
+-    uint256 index
+-  ) internal {
 +   */
-   function _burnScaled(
-     address user,
-     address target,
-@@ -3038,6 +2899,46 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
++  function _burnScaled(address user, address target, uint256 amount, uint256 index) internal {
+     uint256 amountScaled = amount.rayDiv(index);
+     require(amountScaled != 0, Errors.INVALID_BURN_AMOUNT);
+ 
+@@ -3038,6 +2818,41 @@ abstract contract ScaledBalanceTokenBase is MintableIncentivizedERC20, IScaledBa
        emit Burn(user, target, amountToBurn, balanceIncrease, index);
      }
    }
@@ -1120,12 +1358,7 @@ index 9195c28..1b84ad9 100644
 +   * @param amount The amount getting transferred
 +   * @param index The next liquidity index of the reserve
 +   */
-+  function _transfer(
-+    address sender,
-+    address recipient,
-+    uint256 amount,
-+    uint256 index
-+  ) internal {
++  function _transfer(address sender, address recipient, uint256 amount, uint256 index) internal {
 +    uint256 senderScaledBalance = super.balanceOf(sender);
 +    uint256 senderBalanceIncrease = senderScaledBalance.rayMul(index) -
 +      senderScaledBalance.rayMul(_userState[sender].additionalData);
@@ -1154,7 +1387,7 @@ index 9195c28..1b84ad9 100644
  }
  
  /**
-@@ -3121,7 +3022,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3121,7 +2936,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
    bytes32 public constant PERMIT_TYPEHASH =
      keccak256('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)');
  
@@ -1163,7 +1396,21 @@ index 9195c28..1b84ad9 100644
  
    address internal _treasury;
    address internal _underlyingAsset;
-@@ -3152,7 +3053,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3135,10 +2950,9 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+    * @dev Constructor.
+    * @param pool The address of the Pool contract
+    */
+-  constructor(IPool pool)
+-    ScaledBalanceTokenBase(pool, 'ATOKEN_IMPL', 'ATOKEN_IMPL', 0)
+-    EIP712Base()
+-  {
++  constructor(
++    IPool pool
++  ) ScaledBalanceTokenBase(pool, 'ATOKEN_IMPL', 'ATOKEN_IMPL', 0) EIP712Base() {
+     // Intentionally left blank
+   }
+ 
+@@ -3152,7 +2966,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
      string calldata aTokenName,
      string calldata aTokenSymbol,
      bytes calldata params
@@ -1172,7 +1419,7 @@ index 9195c28..1b84ad9 100644
      require(initializingPool == POOL, Errors.POOL_ADDRESSES_DO_NOT_MATCH);
      _setName(aTokenName);
      _setSymbol(aTokenSymbol);
-@@ -3200,7 +3101,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3200,7 +3014,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
    }
  
    /// @inheritdoc IAToken
@@ -1181,7 +1428,7 @@ index 9195c28..1b84ad9 100644
      if (amount == 0) {
        return;
      }
-@@ -3212,12 +3113,10 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3212,22 +3026,16 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
      address from,
      address to,
      uint256 value
@@ -1195,7 +1442,20 @@ index 9195c28..1b84ad9 100644
    }
  
    /// @inheritdoc IERC20
-@@ -3258,7 +3157,11 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+-  function balanceOf(address user)
+-    public
+-    view
+-    virtual
+-    override(IncentivizedERC20, IERC20)
+-    returns (uint256)
+-  {
++  function balanceOf(
++    address user
++  ) public view virtual override(IncentivizedERC20, IERC20) returns (uint256) {
+     return super.balanceOf(user).rayMul(POOL.getReserveNormalizedIncome(_underlyingAsset));
+   }
+ 
+@@ -3258,7 +3066,11 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
    }
  
    /// @inheritdoc IAToken
@@ -1208,23 +1468,23 @@ index 9195c28..1b84ad9 100644
      // Intentionally left blank
    }
  
-@@ -3295,13 +3198,13 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3295,13 +3107,8 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
     * @param to The destination address
     * @param amount The amount getting transferred
     * @param validate True if the transfer needs to be validated, false otherwise
 -   **/
-+   */
-   function _transfer(
-     address from,
-     address to,
-     uint256 amount,
-     bool validate
+-  function _transfer(
+-    address from,
+-    address to,
+-    uint256 amount,
+-    bool validate
 -  ) internal {
-+  ) internal virtual {
++   */
++  function _transfer(address from, address to, uint256 amount, bool validate) internal virtual {
      address underlyingAsset = _underlyingAsset;
  
      uint256 index = POOL.getReserveNormalizedIncome(underlyingAsset);
-@@ -3309,13 +3212,13 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3309,13 +3116,13 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
      uint256 fromBalanceBefore = super.balanceOf(from).rayMul(index);
      uint256 toBalanceBefore = super.balanceOf(to).rayMul(index);
  
@@ -1240,18 +1500,18 @@ index 9195c28..1b84ad9 100644
    }
  
    /**
-@@ -3323,18 +3226,18 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3323,18 +3130,14 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
     * @param from The source address
     * @param to The destination address
     * @param amount The amount getting transferred
 -   **/
-+   */
-   function _transfer(
-     address from,
-     address to,
-     uint128 amount
+-  function _transfer(
+-    address from,
+-    address to,
+-    uint128 amount
 -  ) internal override {
-+  ) internal virtual override {
++   */
++  function _transfer(address from, address to, uint128 amount) internal virtual override {
      _transfer(from, to, amount, true);
    }
  
@@ -1262,7 +1522,7 @@ index 9195c28..1b84ad9 100644
     */
    function DOMAIN_SEPARATOR() public view override(IAToken, EIP712Base) returns (bytes32) {
      return super.DOMAIN_SEPARATOR();
-@@ -3342,7 +3245,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+@@ -3342,7 +3145,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
  
    /**
     * @dev Overrides the base function to fully implement IAToken
@@ -1271,4 +1531,17 @@ index 9195c28..1b84ad9 100644
     */
    function nonces(address owner) public view override(IAToken, EIP712Base) returns (uint256) {
      return super.nonces(owner);
+@@ -3354,11 +3157,7 @@ contract AToken is VersionedInitializable, ScaledBalanceTokenBase, EIP712Base, I
+   }
+ 
+   /// @inheritdoc IAToken
+-  function rescueTokens(
+-    address token,
+-    address to,
+-    uint256 amount
+-  ) external override onlyPoolAdmin {
++  function rescueTokens(address token, address to, uint256 amount) external override onlyPoolAdmin {
+     require(token != _underlyingAsset, Errors.UNDERLYING_CANNOT_BE_RESCUED);
+     IERC20(token).safeTransfer(to, amount);
+   }
 ```

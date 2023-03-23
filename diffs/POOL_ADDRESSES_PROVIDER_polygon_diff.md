@@ -1,6 +1,6 @@
 ```diff
 diff --git a/src/downloads/polygon/POOL_ADDRESSES_PROVIDER.sol b/src/downloads/POOL_ADDRESSES_PROVIDER.sol
-index ebd62af..5a808d1 100644
+index ebd62af..0f7ab98 100644
 --- a/src/downloads/polygon/POOL_ADDRESSES_PROVIDER.sol
 +++ b/src/downloads/POOL_ADDRESSES_PROVIDER.sol
 @@ -90,7 +90,7 @@ contract Ownable is Context {
@@ -80,7 +80,23 @@ index ebd62af..5a808d1 100644
    function setPoolDataProvider(address newDataProvider) external;
  }
  
-@@ -638,7 +638,7 @@ contract InitializableImmutableAdminUpgradeabilityProxy is
+@@ -590,11 +590,10 @@ contract BaseImmutableAdminUpgradeabilityProxy is BaseUpgradeabilityProxy {
+    * It should include the signature and the parameters of the function to be called, as described in
+    * https://solidity.readthedocs.io/en/v0.4.24/abi-spec.html#function-selector-and-argument-encoding.
+    */
+-  function upgradeToAndCall(address newImplementation, bytes calldata data)
+-    external
+-    payable
+-    ifAdmin
+-  {
++  function upgradeToAndCall(
++    address newImplementation,
++    bytes calldata data
++  ) external payable ifAdmin {
+     _upgradeTo(newImplementation);
+     (bool success, ) = newImplementation.delegatecall(data);
+     require(success);
+@@ -638,7 +637,7 @@ contract InitializableImmutableAdminUpgradeabilityProxy is
   * @notice Main registry of addresses part of or connected to the protocol, including permissioned roles
   * @dev Acts as factory of proxies and admin of those, so with right to change its implementations
   * @dev Owned by the Aave Governance
@@ -89,7 +105,23 @@ index ebd62af..5a808d1 100644
  contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
    // Identifier of the Aave Market
    string private _marketId;
-@@ -791,7 +791,7 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
+@@ -688,11 +687,10 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
+   }
+ 
+   /// @inheritdoc IPoolAddressesProvider
+-  function setAddressAsProxy(bytes32 id, address newImplementationAddress)
+-    external
+-    override
+-    onlyOwner
+-  {
++  function setAddressAsProxy(
++    bytes32 id,
++    address newImplementationAddress
++  ) external override onlyOwner {
+     address proxyAddress = _addresses[id];
+     address oldImplementationAddress = _getProxyImplementation(id);
+     _updateImpl(id, newImplementationAddress);
+@@ -791,7 +789,7 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
     *   calls the initialize() function via upgradeToAndCall() in the proxy
     * @param id The id of the proxy to be updated
     * @param newAddress The address of the new implementation
@@ -98,7 +130,7 @@ index ebd62af..5a808d1 100644
    function _updateImpl(bytes32 id, address newAddress) internal {
      address proxyAddress = _addresses[id];
      InitializableImmutableAdminUpgradeabilityProxy proxy;
-@@ -811,7 +811,7 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
+@@ -811,7 +809,7 @@ contract PoolAddressesProvider is Ownable, IPoolAddressesProvider {
    /**
     * @notice Updates the identifier of the Aave market.
     * @param newMarketId The new id of the market

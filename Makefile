@@ -27,23 +27,3 @@ deploy-harmony-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployHarmon
 
 # Create Proposal
 create-proposal-ledger :; forge script scripts/CreateProposal.s.sol:CreateUpgradeProposal --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv
-
-storage-diff :
-	forge inspect lib/aave-v3-core/contracts/protocol/pool/Pool.sol:Pool storage-layout --pretty > reports/Pool_v301_layout.md
-	forge inspect lib/aave-v3-core/contracts/protocol/pool/L2Pool.sol:L2Pool storage-layout --pretty > reports/L2Pool_v301_layout.md
-	forge inspect lib/aave-v3-core/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator storage-layout --pretty > reports/PoolConfigurator_v301_layout.md
-	forge inspect lib/aave-v3-core/contracts/protocol/tokenization/AToken.sol:AToken storage-layout --pretty > reports/AToken_v301_layout.md
-	forge inspect lib/aave-v3-core/contracts/protocol/tokenization/VariableDebtToken.sol:VariableDebtToken storage-layout --pretty > reports/VariableDebtToken_v301_layout.md
-	forge inspect lib/aave-v3-core/contracts/protocol/tokenization/StableDebtToken.sol:StableDebtToken storage-layout --pretty > reports/StableDebtToken_v301_layout.md
-	forge inspect downloads/polygon/POOL_IMPL/Pool/@aave/core-v3/contracts/protocol/pool/Pool.sol:Pool storage-layout --pretty > reports/Pool_layout.md
-	forge inspect downloads/optimism/L2_POOL_IMPL/L2Pool/@aave/core-v3/contracts/protocol/pool/L2Pool.sol:L2Pool storage-layout --pretty > reports/L2Pool_layout.md
-	forge inspect downloads/polygon/POOL_CONFIGURATOR_IMPL/PoolConfigurator/@aave/core-v3/contracts/protocol/pool/PoolConfigurator.sol:PoolConfigurator storage-layout --pretty > reports/PoolConfigurator_layout.md
-	forge inspect downloads/polygon/DEFAULT_A_TOKEN_IMPL_REV_1/AToken/@aave/core-v3/contracts/protocol/tokenization/AToken.sol:AToken storage-layout --pretty > reports/AToken_layout.md
-	forge inspect downloads/polygon/DEFAULT_VARIABLE_DEBT_TOKEN_IMPL_REV_1/VariableDebtToken/@aave/core-v3/contracts/protocol/tokenization/VariableDebtToken.sol:VariableDebtToken storage-layout --pretty > reports/VariableDebtToken_layout.md
-	forge inspect downloads/polygon/DEFAULT_STABLE_DEBT_TOKEN_IMPL_REV_1/StableDebtToken/@aave/core-v3/contracts/protocol/tokenization/StableDebtToken.sol:StableDebtToken storage-layout --pretty > reports/StableDebtToken_layout.md
-	make git-diff before=reports/Pool_layout.md after=reports/Pool_v301_layout.md out=Pool_layout_diff
-	make git-diff before=reports/L2Pool_layout.md after=reports/L2Pool_v301_layout.md out=L2Pool_layout_diff
-	make git-diff before=reports/PoolConfigurator_layout.md after=reports/PoolConfigurator_v301_layout.md out=PoolConfigurator_layout_diff
-	make git-diff before=reports/AToken_layout.md after=reports/AToken_v301_layout.md out=AToken_layout_diff
-	make git-diff before=reports/VariableDebtToken_layout.md after=reports/VariableDebtToken_v301_layout.md out=VariableDebtToken_layout_diff
-	make git-diff before=reports/StableDebtToken_layout.md after=reports/StableDebtToken_v301_layout.md out=StableDebtToken_layout_diff

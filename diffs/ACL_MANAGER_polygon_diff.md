@@ -1,9 +1,43 @@
 ```diff
 diff --git a/src/downloads/polygon/ACL_MANAGER.sol b/src/downloads/ACL_MANAGER.sol
-index 940542a..762f518 100644
+index 940542a..834427d 100644
 --- a/src/downloads/polygon/ACL_MANAGER.sol
 +++ b/src/downloads/ACL_MANAGER.sol
-@@ -433,7 +433,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
+@@ -336,12 +336,10 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
+    *
+    * - the caller must have ``role``'s admin role.
+    */
+-  function grantRole(bytes32 role, address account)
+-    public
+-    virtual
+-    override
+-    onlyRole(getRoleAdmin(role))
+-  {
++  function grantRole(
++    bytes32 role,
++    address account
++  ) public virtual override onlyRole(getRoleAdmin(role)) {
+     _grantRole(role, account);
+   }
+ 
+@@ -354,12 +352,10 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
+    *
+    * - the caller must have ``role``'s admin role.
+    */
+-  function revokeRole(bytes32 role, address account)
+-    public
+-    virtual
+-    override
+-    onlyRole(getRoleAdmin(role))
+-  {
++  function revokeRole(
++    bytes32 role,
++    address account
++  ) public virtual override onlyRole(getRoleAdmin(role)) {
+     _revokeRole(role, account);
+   }
+ 
+@@ -433,7 +429,7 @@ abstract contract AccessControl is Context, IAccessControl, ERC165 {
   * @title IPoolAddressesProvider
   * @author Aave
   * @notice Defines the basic interface for a Pool Addresses Provider.
@@ -12,7 +46,7 @@ index 940542a..762f518 100644
  interface IPoolAddressesProvider {
    /**
     * @dev Emitted when the market identifier is updated.
-@@ -528,7 +528,7 @@ interface IPoolAddressesProvider {
+@@ -528,7 +524,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Returns the id of the Aave market to which this contract points to.
     * @return The market id
@@ -21,7 +55,7 @@ index 940542a..762f518 100644
    function getMarketId() external view returns (string memory);
  
    /**
-@@ -570,27 +570,27 @@ interface IPoolAddressesProvider {
+@@ -570,27 +566,27 @@ interface IPoolAddressesProvider {
    /**
     * @notice Returns the address of the Pool proxy.
     * @return The Pool proxy address
@@ -53,7 +87,7 @@ index 940542a..762f518 100644
    function setPoolConfiguratorImpl(address newPoolConfiguratorImpl) external;
  
    /**
-@@ -614,7 +614,7 @@ interface IPoolAddressesProvider {
+@@ -614,7 +610,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the ACL manager.
     * @param newAclManager The address of the new ACLManager
@@ -62,7 +96,7 @@ index 940542a..762f518 100644
    function setACLManager(address newAclManager) external;
  
    /**
-@@ -638,7 +638,7 @@ interface IPoolAddressesProvider {
+@@ -638,7 +634,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the price oracle sentinel.
     * @param newPriceOracleSentinel The address of the new PriceOracleSentinel
@@ -71,7 +105,7 @@ index 940542a..762f518 100644
    function setPriceOracleSentinel(address newPriceOracleSentinel) external;
  
    /**
-@@ -650,7 +650,7 @@ interface IPoolAddressesProvider {
+@@ -650,7 +646,7 @@ interface IPoolAddressesProvider {
    /**
     * @notice Updates the address of the data provider.
     * @param newDataProvider The address of the new DataProvider
@@ -80,7 +114,7 @@ index 940542a..762f518 100644
    function setPoolDataProvider(address newDataProvider) external;
  }
  
-@@ -658,7 +658,7 @@ interface IPoolAddressesProvider {
+@@ -658,7 +654,7 @@ interface IPoolAddressesProvider {
   * @title IACLManager
   * @author Aave
   * @notice Defines the basic interface for the ACL Manager
@@ -89,7 +123,7 @@ index 940542a..762f518 100644
  interface IACLManager {
    /**
     * @notice Returns the contract address of the PoolAddressesProvider
-@@ -774,7 +774,7 @@ interface IACLManager {
+@@ -774,7 +770,7 @@ interface IACLManager {
    function addFlashBorrower(address borrower) external;
  
    /**
@@ -98,7 +132,7 @@ index 940542a..762f518 100644
     * @param borrower The address of the FlashBorrower to remove
     */
    function removeFlashBorrower(address borrower) external;
-@@ -878,13 +878,12 @@ library Errors {
+@@ -878,13 +874,12 @@ library Errors {
    string public constant HEALTH_FACTOR_NOT_BELOW_THRESHOLD = '45'; // 'Health factor is not below the threshold'
    string public constant COLLATERAL_CANNOT_BE_LIQUIDATED = '46'; // 'The collateral chosen cannot be liquidated'
    string public constant SPECIFIED_CURRENCY_NOT_BORROWED_BY_USER = '47'; // 'User did not borrow the specified currency'
@@ -113,7 +147,16 @@ index 940542a..762f518 100644
    string public constant STABLE_DEBT_NOT_ZERO = '55'; // 'Stable debt supply is not zero'
    string public constant VARIABLE_DEBT_SUPPLY_NOT_ZERO = '56'; // 'Variable debt supply is not zero'
    string public constant LTV_VALIDATION_FAILED = '57'; // 'Ltv validation failed'
-@@ -921,6 +920,7 @@ library Errors {
+@@ -892,7 +887,7 @@ library Errors {
+   string public constant PRICE_ORACLE_SENTINEL_CHECK_FAILED = '59'; // 'Price oracle sentinel validation failed'
+   string public constant ASSET_NOT_BORROWABLE_IN_ISOLATION = '60'; // 'Asset is not borrowable in isolation mode'
+   string public constant RESERVE_ALREADY_INITIALIZED = '61'; // 'Reserve has already been initialized'
+-  string public constant USER_IN_ISOLATION_MODE = '62'; // 'User is in isolation mode'
++  string public constant USER_IN_ISOLATION_MODE_OR_LTV_ZERO = '62'; // 'User is in isolation mode or ltv is zero'
+   string public constant INVALID_LTV = '63'; // 'Invalid ltv parameter for the reserve'
+   string public constant INVALID_LIQ_THRESHOLD = '64'; // 'Invalid liquidity threshold parameter for the reserve'
+   string public constant INVALID_LIQ_BONUS = '65'; // 'Invalid liquidity bonus parameter for the reserve'
+@@ -921,6 +916,7 @@ library Errors {
    string public constant STABLE_BORROWING_ENABLED = '88'; // 'Stable borrowing is enabled'
    string public constant SILOED_BORROWING_VIOLATION = '89'; // 'User is trying to borrow multiple assets including a siloed one'
    string public constant RESERVE_DEBT_NOT_ZERO = '90'; // the total debt of the reserve needs to be 0
@@ -121,4 +164,20 @@ index 940542a..762f518 100644
  }
  
  /**
+@@ -951,11 +947,10 @@ contract ACLManager is AccessControl, IACLManager {
+   }
+ 
+   /// @inheritdoc IACLManager
+-  function setRoleAdmin(bytes32 role, bytes32 adminRole)
+-    external
+-    override
+-    onlyRole(DEFAULT_ADMIN_ROLE)
+-  {
++  function setRoleAdmin(
++    bytes32 role,
++    bytes32 adminRole
++  ) external override onlyRole(DEFAULT_ADMIN_ROLE) {
+     _setRoleAdmin(role, adminRole);
+   }
+ 
 ```

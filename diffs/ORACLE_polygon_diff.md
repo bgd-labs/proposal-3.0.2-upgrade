@@ -1,6 +1,6 @@
 ```diff
 diff --git a/src/downloads/polygon/ORACLE.sol b/src/downloads/ORACLE.sol
-index 248b91f..1a77e74 100644
+index 248b91f..d6e1e69 100644
 --- a/src/downloads/polygon/ORACLE.sol
 +++ b/src/downloads/ORACLE.sol
 @@ -72,13 +72,12 @@ library Errors {
@@ -18,6 +18,15 @@ index 248b91f..1a77e74 100644
    string public constant STABLE_DEBT_NOT_ZERO = '55'; // 'Stable debt supply is not zero'
    string public constant VARIABLE_DEBT_SUPPLY_NOT_ZERO = '56'; // 'Variable debt supply is not zero'
    string public constant LTV_VALIDATION_FAILED = '57'; // 'Ltv validation failed'
+@@ -86,7 +85,7 @@ library Errors {
+   string public constant PRICE_ORACLE_SENTINEL_CHECK_FAILED = '59'; // 'Price oracle sentinel validation failed'
+   string public constant ASSET_NOT_BORROWABLE_IN_ISOLATION = '60'; // 'Asset is not borrowable in isolation mode'
+   string public constant RESERVE_ALREADY_INITIALIZED = '61'; // 'Reserve has already been initialized'
+-  string public constant USER_IN_ISOLATION_MODE = '62'; // 'User is in isolation mode'
++  string public constant USER_IN_ISOLATION_MODE_OR_LTV_ZERO = '62'; // 'User is in isolation mode or ltv is zero'
+   string public constant INVALID_LTV = '63'; // 'Invalid ltv parameter for the reserve'
+   string public constant INVALID_LIQ_THRESHOLD = '64'; // 'Invalid liquidity threshold parameter for the reserve'
+   string public constant INVALID_LIQ_BONUS = '65'; // 'Invalid liquidity bonus parameter for the reserve'
 @@ -115,13 +114,14 @@ library Errors {
    string public constant STABLE_BORROWING_ENABLED = '88'; // 'Stable borrowing is enabled'
    string public constant SILOED_BORROWING_VIOLATION = '89'; // 'User is trying to borrow multiple assets including a siloed one'
@@ -161,4 +170,48 @@ index 248b91f..1a77e74 100644
    modifier onlyAssetListingOrPoolAdmins() {
      _onlyAssetListingOrPoolAdmins();
      _;
+@@ -660,20 +660,17 @@ contract AaveOracle is IAaveOracle {
+   }
+ 
+   /// @inheritdoc IAaveOracle
+-  function setAssetSources(address[] calldata assets, address[] calldata sources)
+-    external
+-    override
+-    onlyAssetListingOrPoolAdmins
+-  {
++  function setAssetSources(
++    address[] calldata assets,
++    address[] calldata sources
++  ) external override onlyAssetListingOrPoolAdmins {
+     _setAssetsSources(assets, sources);
+   }
+ 
+   /// @inheritdoc IAaveOracle
+-  function setFallbackOracle(address fallbackOracle)
+-    external
+-    override
+-    onlyAssetListingOrPoolAdmins
+-  {
++  function setFallbackOracle(
++    address fallbackOracle
++  ) external override onlyAssetListingOrPoolAdmins {
+     _setFallbackOracle(fallbackOracle);
+   }
+ 
+@@ -718,12 +715,9 @@ contract AaveOracle is IAaveOracle {
+   }
+ 
+   /// @inheritdoc IAaveOracle
+-  function getAssetsPrices(address[] calldata assets)
+-    external
+-    view
+-    override
+-    returns (uint256[] memory)
+-  {
++  function getAssetsPrices(
++    address[] calldata assets
++  ) external view override returns (uint256[] memory) {
+     uint256[] memory prices = new uint256[](assets.length);
+     for (uint256 i = 0; i < assets.length; i++) {
+       prices[i] = getAssetPrice(assets[i]);
 ```

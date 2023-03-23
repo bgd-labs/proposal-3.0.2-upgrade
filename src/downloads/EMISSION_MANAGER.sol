@@ -241,16 +241,6 @@ interface IRewardsDistributor {
   );
 
   /**
-   * @dev Emitted when the emission manager address is updated.
-   * @param oldEmissionManager The address of the old emission manager
-   * @param newEmissionManager The address of the new emission manager
-   */
-  event EmissionManagerUpdated(
-    address indexed oldEmissionManager,
-    address indexed newEmissionManager
-  );
-
-  /**
    * @dev Sets the end date for the distribution
    * @param asset The asset to incentivize
    * @param reward The reward token that incentives the asset
@@ -321,13 +311,7 @@ interface IRewardsDistributor {
    * @return The old index of the asset distribution
    * @return The new index of the asset distribution
    **/
-  function getAssetIndex(address asset, address reward)
-    external
-    view
-    returns(
-      uint256,
-      uint256
-    );
+  function getAssetIndex(address asset, address reward) external view returns (uint256, uint256);
 
   /**
    * @dev Returns the list of available reward token addresses of an incentivized asset
@@ -386,13 +370,14 @@ interface IRewardsDistributor {
    * @dev Returns the address of the emission manager
    * @return The address of the EmissionManager
    */
-  function getEmissionManager() external view returns (address);
+  function EMISSION_MANAGER() external view returns (address);
 
   /**
-   * @dev Updates the address of the emission manager
-   * @param emissionManager The address of the new EmissionManager
+   * @dev Returns the address of the emission manager.
+   * Deprecated: This getter is maintained for compatibility purposes. Use the `EMISSION_MANAGER()` function instead.
+   * @return The address of the EmissionManager
    */
-  function setEmissionManager(address emissionManager) external;
+  function getEmissionManager() external view returns (address);
 }
 
 /**
@@ -500,14 +485,15 @@ interface IRewardsController is IRewardsDistributor {
 
   /**
    * @dev Called by the corresponding asset on transfer hook in order to update the rewards distribution.
-   * @param user The address of the user whose asset balance has changed 
-   * @param userBalance The previous user balance prior to balance change 
+   * @dev The units of `totalSupply` and `userBalance` should be the same.
+   * @param user The address of the user whose asset balance has changed
    * @param totalSupply The total supply of the asset prior to user balance change
+   * @param userBalance The previous user balance prior to balance change
    **/
   function handleAction(
     address user,
-    uint256 userBalance,
-    uint256 totalSupply
+    uint256 totalSupply,
+    uint256 userBalance
   ) external;
 
   /**
@@ -680,13 +666,6 @@ interface IEmissionManager {
   function setClaimer(address user, address claimer) external;
 
   /**
-   * @dev Updates the address of the emission manager
-   * @dev Only callable by the owner of the EmissionManager
-   * @param emissionManager The address of the new EmissionManager
-   */
-  function setEmissionManager(address emissionManager) external;
-
-  /**
    * @dev Updates the admin of the reward emission
    * @dev Only callable by the owner of the EmissionManager
    * @param reward The address of the reward token
@@ -736,11 +715,9 @@ contract EmissionManager is Ownable, IEmissionManager {
 
   /**
    * Constructor.
-   * @param controller The address of the RewardsController contract
    * @param owner The address of the owner
    */
-  constructor(address controller, address owner) {
-    _rewardsController = IRewardsController(controller);
+  constructor(address owner) {
     transferOwnership(owner);
   }
 
@@ -794,11 +771,6 @@ contract EmissionManager is Ownable, IEmissionManager {
   /// @inheritdoc IEmissionManager
   function setClaimer(address user, address claimer) external override onlyOwner {
     _rewardsController.setClaimer(user, claimer);
-  }
-
-  /// @inheritdoc IEmissionManager
-  function setEmissionManager(address emissionManager) external override onlyOwner {
-    _rewardsController.setEmissionManager(emissionManager);
   }
 
   /// @inheritdoc IEmissionManager
