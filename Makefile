@@ -17,8 +17,10 @@ git-diff :
 	@printf '%s\n%s\n%s\n' "\`\`\`diff" "$$(git diff --no-index --diff-algorithm=patience --ignore-space-at-eol ${before} ${after})" "\`\`\`" > diffs/${out}.md
 
 # Deploy libraries
-deploy-libraries-part1 :;  forge script scripts/DeployLogic.s.sol:DeployLibrariesChunk1 --rpc-url ${chain} --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-libraries-part2 :;  forge script scripts/DeployLogic.s.sol:DeployLibrariesChunk2 --rpc-url ${chain} --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-libs-broadcast :
+	forge script -vvvv scripts/lib/LibraryPreCompileOne.sol --rpc-url ${chain} --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --broadcast --verify --slow && \
+	sleep 1 && \
+	forge script -vvvv scripts/lib/LibraryPreCompileTwo.sol --rpc-url ${chain} --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --broadcast --verify --slow
 
 # Deploy Payloads
 deploy-mainnet-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployMainnet --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
