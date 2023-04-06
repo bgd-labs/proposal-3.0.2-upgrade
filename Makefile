@@ -23,13 +23,13 @@ deploy-libs-broadcast :
 	forge script -vvvv scripts/lib/LibraryPreCompileTwo.sol --rpc-url ${chain} --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --broadcast --verify --slow
 
 # Deploy Payloads
-deploy-mainnet-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployMainnet --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-polygon-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployPolygon --rpc-url polygon --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-optimism-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployOptimism --rpc-url optimism --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-arbitrum-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployArbitrum --rpc-url arbitrum --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-avalanche-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployAvalanche --rpc-url avalanche --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-fantom-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployFantom --rpc-url fantom --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
-deploy-harmony-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployHarmony --rpc-url harmony --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv --slow
+deploy-mainnet-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployMainnet --rpc-url mainnet --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-polygon-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployPolygon --rpc-url polygon --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-optimism-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployOptimism --rpc-url optimism --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-arbitrum-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployArbitrum --rpc-url arbitrum --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-avalanche-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployAvalanche --rpc-url avalanche --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-fantom-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployFantom --rpc-url fantom --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} --verify -vvvv --slow
+deploy-harmony-ledger :;  forge script scripts/DeployPayloads.s.sol:DeployHarmony --rpc-url harmony --broadcast --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv --slow
 
 # Create Proposal
 create-proposal-ledger :; forge script scripts/CreateProposal.s.sol:CreateUpgradeProposal --rpc-url mainnet --broadcast --legacy --ledger --mnemonic-indexes ${MNEMONIC_INDEX} --sender ${LEDGER_SENDER} -vvvv

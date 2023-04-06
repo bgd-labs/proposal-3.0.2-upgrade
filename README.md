@@ -136,3 +136,11 @@ forge install
 ```sh
 forge test
 ```
+
+### Step 1
+
+FOUNDRY_LIBRARIES=lib/aave-v3-core/contracts/protocol/libraries/logic/BorrowLogic.sol:BorrowLogic:0x5d834EAD0a80CF3b88c06FeeD6e8E0Fcae2daEE5,lib/aave-v3-core/contracts/protocol/libraries/logic/BridgeLogic.sol:BridgeLogic:0x57572C9e795F4B6A748EFBeAB7E0a1B9996A0A24,lib/aave-v3-core/contracts/protocol/libraries/logic/ConfiguratorLogic.sol:ConfiguratorLogic:0x7406aba1Aa5fE5cd71d958CE10fc28c416a33aA0,lib/aave-v3-core/contracts/protocol/libraries/logic/EModeLogic.sol:EModeLogic:0xeAbd65827E91Ac3aE5471C11A329fbc675cA46d6
+
+### Step 2
+
+FOUNDRY_LIBRARIES=lib/aave-v3-core/contracts/protocol/libraries/logic/BorrowLogic.sol:BorrowLogic:0x5d834EAD0a80CF3b88c06FeeD6e8E0Fcae2daEE5,lib/aave-v3-core/contracts/protocol/libraries/logic/BridgeLogic.sol:BridgeLogic:0x57572C9e795F4B6A748EFBeAB7E0a1B9996A0A24,lib/aave-v3-core/contracts/protocol/libraries/logic/ConfiguratorLogic.sol:ConfiguratorLogic:0x7406aba1Aa5fE5cd71d958CE10fc28c416a33aA0,lib/aave-v3-core/contracts/protocol/libraries/logic/EModeLogic.sol:EModeLogic:0xeAbd65827E91Ac3aE5471C11A329fbc675cA46d6,lib/aave-v3-core/contracts/protocol/libraries/logic/FlashLoanLogic.sol:FlashLoanLogic:0x0A62276bFBF1Ad8443f37Da8630d407408085c8b,lib/aave-v3-core/contracts/protocol/libraries/logic/LiquidationLogic.sol:LiquidationLogic:0xe175De51F29d822b86e46A9A61246Ec90631210D,lib/aave-v3-core/contracts/protocol/libraries/logic/PoolLogic.sol:PoolLogic:0xD5256981e08492AFc543aF2a779Af989E9f9F7e7,lib/aave-v3-core/contracts/protocol/libraries/logic/SupplyLogic.sol:SupplyLogic:0x39dF4b1329D41A9AE20e17BeFf39aAbd2f049128
