@@ -21,10 +21,9 @@ library ForkBlocks {
 
 /**
  * @dev commented out as only used to create initial snapshot to compare against.
- * Just generating snapshots via ProtocolV3TestBase so we can compare with ProtocolV3_0_1TestBase
+ * Just generating snapshots via ProtocolV3TestBase so we can compare with ProtocolV3_0_1TestBase after execution
  */
 // contract V301UpgradePreProposalSnapshot is ProtocolV3TestBase {
-//   uint256 mainnetFork;
 //   uint256 polygonFork;
 //   uint256 avalancheFork;
 //   uint256 optimismFork;
@@ -33,18 +32,12 @@ library ForkBlocks {
 //   uint256 fantomFork;
 
 //   function setUp() public {
-//     mainnetFork = vm.createFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
 //     polygonFork = vm.createFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
 //     avalancheFork = vm.createFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
 //     optimismFork = vm.createFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
 //     arbitrumFork = vm.createFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
 //     // harmonyFork = vm.createFork(vm.rpcUrl('harmony'), ForkBlocks.HARMONY);
 //     fantomFork = vm.createFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
-//   }
-
-//   function testMainnet() public {
-//     vm.selectFork(mainnetFork);
-//     createConfigurationSnapshot('pre-upgrade-mainnet', AaveV3Ethereum.POOL);
 //   }
 
 //   // function testHarmony() public {
@@ -77,6 +70,23 @@ library ForkBlocks {
 //     createConfigurationSnapshot('pre-upgrade-arbitrum', AaveV3Arbitrum.POOL);
 //   }
 // }
+
+/**
+ * @dev commented out as only used to create initial snapshot to compare against.
+ * Generating snapshots via ProtocolV3_0_1TestBase so we can compare with ProtocolV3_0_1TestBase after execution
+ */
+contract V301UpgradePreProposalSnapshotMainnet is ProtocolV3_0_1TestBase {
+  uint256 mainnetFork;
+
+  function setUp() public {
+    mainnetFork = vm.createFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
+  }
+
+  function testMainnet() public {
+    vm.selectFork(mainnetFork);
+    createConfigurationSnapshot('pre-upgrade-mainnet', AaveV3Ethereum.POOL);
+  }
+}
 
 contract V301UpgradeMainnetProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
   V301EthereumUpgradePayload public proposalPayload =
