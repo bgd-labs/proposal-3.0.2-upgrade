@@ -33,7 +33,7 @@ library ForkBlocks {
 //   uint256 fantomFork;
 
 //   function setUp() public {
-//     mainnetFork = vm.createSelectFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
+//     mainnetFork = vm.createFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
 //     polygonFork = vm.createFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
 //     avalancheFork = vm.createFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
 //     optimismFork = vm.createFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
@@ -42,21 +42,39 @@ library ForkBlocks {
 //     fantomFork = vm.createFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
 //   }
 
-//   function testCreateSnapshot() public {
+//   function testMainnet() public {
 //     vm.selectFork(mainnetFork);
 //     createConfigurationSnapshot('pre-upgrade-mainnet', AaveV3Ethereum.POOL);
-//     vm.selectFork(polygonFork);
-//     createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Polygon.POOL);
+//   }
+
+//   // function testHarmony() public {
+//   //   vm.selectFork(harmonyFork);
+//   //   createConfigurationSnapshot('pre-upgrade-harmony', AaveV3Harmony.POOL);
+//   // }
+
+//   function testAvalanche() public {
 //     vm.selectFork(avalancheFork);
 //     createConfigurationSnapshot('pre-upgrade-avalanche', AaveV3Avalanche.POOL);
-//     vm.selectFork(optimismFork);
-//     createConfigurationSnapshot('pre-upgrade-optimism', AaveV3Optimism.POOL);
-//     vm.selectFork(arbitrumFork);
-//     createConfigurationSnapshot('pre-upgrade-arbitrum', AaveV3Arbitrum.POOL);
-//     // vm.selectFork(harmonyFork);
-//     // createConfigurationSnapshot('pre-upgrade-harmony', AaveV3Harmony.POOL);
+//   }
+
+//   function testFantom() public {
 //     vm.selectFork(fantomFork);
 //     createConfigurationSnapshot('pre-upgrade-fantom', AaveV3Fantom.POOL);
+//   }
+
+//   function testPolygon() public {
+//     vm.selectFork(polygonFork);
+//     createConfigurationSnapshot('pre-upgrade-polygon', AaveV3Polygon.POOL);
+//   }
+
+//   function testOptimism() public {
+//     vm.selectFork(optimismFork);
+//     createConfigurationSnapshot('pre-upgrade-optimism', AaveV3Optimism.POOL);
+//   }
+
+//   function testArbitrum() public {
+//     vm.selectFork(arbitrumFork);
+//     createConfigurationSnapshot('pre-upgrade-arbitrum', AaveV3Arbitrum.POOL);
 //   }
 // }
 
@@ -93,13 +111,12 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 }
 
 contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1TestBase {
-  V301L2UpgradePayload public proposalPayload;
+  V301L2UpgradePayload public proposalPayload =
+    V301L2UpgradePayload(0xD792a3779D3C80bAEe8CF3304D6aEAc74bC432BE);
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
     _selectPayloadExecutor(AaveV3Avalanche.ACL_ADMIN);
-
-    proposalPayload = DeployPayloads.deployAvalanche();
   }
 
   function testProposal() public {
