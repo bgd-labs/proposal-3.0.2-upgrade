@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@bgd-labs/aave-address-book": "^1.19.0",
+    "@bgd-labs/report-engine": "^0.0.3",
     "dotenv": "^16.0.3",
     "ethers": "^5.7.2"
   }
