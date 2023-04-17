@@ -2,7 +2,7 @@
 
 ## Context
 
-The [v3.0.1](https://github.com/aave/aave-v3-core/tree/feat/3.0.1) upgrade introduces a new `flashloanable` configuration boolean per asset, as this value resides on a previously unused storage space, if will default to `false` effectively disabling flashloans. Therefore to create the proposal in a non-breaking manner, it will also set `flashLoanable` to `true` for all assets.
+The [v3.0.1](https://github.com/aave/aave-v3-core/tree/feat/3.0.1) upgrade introduces a new `flashloanable` configuration boolean per asset, as this value resides on a previously unused storage space, it will default to `false` effectively disabling flashloans. Therefore to create the proposal in a non-breaking manner, it will also set `flashLoanable` to `true` for all assets.
 To keep the proposal execution within reasonable gas limits, the generic `V301L2UpgradePayload` expects to be initialized with [pre-deployed implementations](./scripts/DeployPayloads.s.sol).
 
 The [v3.0.2](https://github.com/aave/aave-v3-core/pull/832) upgrade includes improvements to the handling of isolation mode, LTV0, and flashBorrower initiated flashloans. The changes are isolated to the poolImplementation.
