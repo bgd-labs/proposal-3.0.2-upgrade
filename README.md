@@ -141,6 +141,12 @@ Snapshots:
 To ensure storage compatibility between new and old implementations we created storage layout snapshots for v3 and v3.0.2 contracts and diffed them.
 You can find the snapshots in the [reports](./reports/) directory and a diff for all the storage-layouts within the [diffs](./diffs/) folder.
 
+### Audits
+
+The changes for 3.0.1 have been audited by [sigma prime](https://github.com/aave/aave-v3-core/blob/master/audits/23-12-2022_SigmaPrime_AaveV3-0-1.pdf) and [PeckShield](https://github.com/aave/aave-v3-core/blob/master/audits/09-12-2022_PeckShield_AaveV3-0-1.pdf).
+
+The changes for 3.0.2 have been audited by [Certora](./audits/Aave_V3.0.2_PR_820_Report_Mar2023.pdf) & [sigma prime](TBA).
+
 ### E2E tests
 
 We simulated the proposal execution and afterwards ran our E2E test suite, covering supply, withdraw and borrow of all listed assets on a respective pool(excluding fantom & harmony as all assets are frozen on these networks).
