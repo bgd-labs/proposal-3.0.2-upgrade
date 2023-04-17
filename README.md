@@ -11,7 +11,7 @@ The [v3.0.2](https://github.com/aave/aave-v3-core/pull/832) upgrade includes imp
 
 ### 3.0.0 -> 3.0.2
 
-To figure out which contracts require an update and which don't we compared the contracts of `Aave V3 Ethereum` with the [v3.0.2 release branch](https://github.com/aave/aave-v3-core/tree/feat/3.0.2).
+To figure out which contracts require an update and which don't we compared the contracts of `Aave V3 Polygon` with the [v3.0.2 release branch](https://github.com/aave/aave-v3-core/tree/feat/3.0.2).
 Upon closer inspection the following contracts should be upgraded in the v3.0.0 -> v3.0.2 upgrade process:
 
 - AAVE_PROTOCOL_DATA_PROVIDER
