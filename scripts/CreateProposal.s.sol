@@ -13,7 +13,10 @@ contract CreateUpgradeProposal is Script {
     payloads[3] = GovHelpers.buildArbitrum(0x209Ad99bd808221293d03827B86cC544bcA0023b); // https://arbiscan.io/address/0x209ad99bd808221293d03827b86cc544bca0023b
 
     vm.startBroadcast();
-    GovHelpers.createProposal(payloads, bytes32(''));
+    GovHelpers.createProposal(
+      payloads,
+      0x55426ad34b9642fc138837d67391ecf707f97e5a37a09c6cfa031a7603d3ee1c
+    );
     vm.stopBroadcast();
   }
 }
