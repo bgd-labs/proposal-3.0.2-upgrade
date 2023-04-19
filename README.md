@@ -145,7 +145,7 @@ You can find the snapshots in the [reports](./reports/) directory and a diff for
 
 The changes for 3.0.1 have been audited by [sigma prime](https://github.com/aave/aave-v3-core/blob/master/audits/23-12-2022_SigmaPrime_AaveV3-0-1.pdf) and [PeckShield](https://github.com/aave/aave-v3-core/blob/master/audits/09-12-2022_PeckShield_AaveV3-0-1.pdf).
 
-The changes for 3.0.2 have been audited by [Certora](./audits/Aave_V3.0.2_PR_820_Report_Mar2023.pdf) & [sigma prime](TBA).
+The changes for 3.0.2 have been audited by [Certora](./audits/Aave_V3.0.2_PR_820_Report_Mar2023.pdf) & [sigma prime](./audits/19-04-2023_SigmaPrime_AaveV3-0-2.pdf).
 
 ### E2E tests
 
