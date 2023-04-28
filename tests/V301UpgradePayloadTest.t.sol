@@ -94,11 +94,18 @@ contract V301UpgradeMainnetProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
+    proposalPayload = DeployPayloads.deployMainnet();
     _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR); // admin is the guardian
   }
 
   function testProposal() public {
+    uint128 premiumTotalBefore = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolBefore = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
     _executePayload(address(proposalPayload));
+    uint128 premiumTotalAfter = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolAfter = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
+    assertEq(premiumTotalBefore, premiumTotalAfter);
+    assertEq(premiumProtocolBefore, premiumProtocolAfter);
     createConfigurationSnapshot('post-upgrade-mainnet', AaveV3Ethereum.POOL);
     diffReports('pre-upgrade-mainnet', 'post-upgrade-mainnet');
   }
@@ -110,11 +117,18 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
+    proposalPayload = DeployPayloads.deployPolygon();
     _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
   }
 
   function testProposal() public {
+    uint128 premiumTotalBefore = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolBefore = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
     _executePayload(address(proposalPayload));
+    uint128 premiumTotalAfter = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolAfter = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
+    assertEq(premiumTotalBefore, premiumTotalAfter);
+    assertEq(premiumProtocolBefore, premiumProtocolAfter);
     createConfigurationSnapshot('post-upgrade-polygon', AaveV3Polygon.POOL);
     diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
   }

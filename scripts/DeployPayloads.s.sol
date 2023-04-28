@@ -141,11 +141,11 @@ library DeployPayloads {
   }
 
   function deployMainnet() internal returns (V301EthereumUpgradePayload) {
-    address poolImpl = _deployPoolImpl(AaveV3Ethereum.POOL_ADDRESSES_PROVIDER);
     return
       new V301EthereumUpgradePayload(
         AaveV3Ethereum.POOL_ADDRESSES_PROVIDER,
-        poolImpl,
+        AaveV3Ethereum.POOL_CONFIGURATOR,
+        0xF1Cd4193bbc1aD4a23E833170f49d60f3D35a621, // https://etherscan.io/address/0xF1Cd4193bbc1aD4a23E833170f49d60f3D35a621#code
         AaveV3Ethereum.ACL_MANAGER,
         AaveV3Ethereum.SWAP_COLLATERAL_ADAPTER,
         AaveV2Ethereum.MIGRATION_HELPER
@@ -153,13 +153,20 @@ library DeployPayloads {
   }
 
   function deployPolygon() internal returns (V301L2UpgradePayload) {
-    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+    // addresses from https://polygonscan.com/address/0xa603ad2b0258bdda94f3dfdb26859ef205ae9244#readContract
+    V301L2UpgradePayload.AddressArgs memory addresses = V301L2UpgradePayload.AddressArgs({
       poolAddressesProvider: AaveV3Polygon.POOL_ADDRESSES_PROVIDER,
-      pool: AaveV3Polygon.POOL
+      pool: AaveV3Polygon.POOL,
+      poolConfigurator: AaveV3Polygon.POOL_CONFIGURATOR,
+      collector: AaveV3Polygon.COLLECTOR,
+      incentivesController: AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER,
+      newPoolImpl: 0xb77fc84a549ecc0b410d6fa15159C2df207545a3,
+      newPoolConfiguratorImpl: 0xADf86b537eF08591c2777E144322E8b0Ca7E82a7,
+      newProtocolDataProvider: 0x9441B65EE553F70df9C77d45d3283B6BC24F222d,
+      newATokenImpl: 0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE,
+      newVTokenImpl: 0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93,
+      newSTokenImpl: 0x50ddd0Cd4266299527d25De9CBb55fE0EB8dAc30
     });
-    addresses.poolConfigurator = AaveV3Polygon.POOL_CONFIGURATOR;
-    addresses.collector = AaveV3Polygon.COLLECTOR;
-    addresses.incentivesController = AaveV3Polygon.DEFAULT_INCENTIVES_CONTROLLER;
 
     return
       new SwapMigratorPermissionsPayload(
