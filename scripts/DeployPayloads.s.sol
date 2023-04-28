@@ -178,13 +178,19 @@ library DeployPayloads {
   }
 
   function deployAvalanche() internal returns (V301L2UpgradePayload) {
-    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+    V301L2UpgradePayload.AddressArgs memory addresses = V301L2UpgradePayload.AddressArgs({
       poolAddressesProvider: AaveV3Avalanche.POOL_ADDRESSES_PROVIDER,
-      pool: AaveV3Avalanche.POOL
+      pool: AaveV3Avalanche.POOL,
+      poolConfigurator: AaveV3Avalanche.POOL_CONFIGURATOR,
+      collector: AaveV3Avalanche.COLLECTOR,
+      incentivesController: AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER,
+      newPoolImpl: 0xCf85FF1c37c594a10195F7A9Ab85CBb0a03f69dE,
+      newPoolConfiguratorImpl: 0x79b5e91037AE441dE0d9e6fd3Fd85b96B83d4E93,
+      newProtocolDataProvider: 0x50ddd0Cd4266299527d25De9CBb55fE0EB8dAc30,
+      newATokenImpl: 0x1E81af09001aD208BDa68FF022544dB2102A752d,
+      newVTokenImpl: 0xa0d9C1E9E48Ca30c8d8C3B5D69FF5dc1f6DFfC24,
+      newSTokenImpl: 0x893411580e590D62dDBca8a703d61Cc4A8c7b2b9
     });
-    addresses.poolConfigurator = AaveV3Avalanche.POOL_CONFIGURATOR;
-    addresses.collector = AaveV3Avalanche.COLLECTOR;
-    addresses.incentivesController = AaveV3Avalanche.DEFAULT_INCENTIVES_CONTROLLER;
 
     return
       new SwapMigratorPermissionsPayload(
@@ -196,13 +202,19 @@ library DeployPayloads {
   }
 
   function deployFantom() internal returns (V301L2UpgradePayload) {
-    V301L2UpgradePayload.AddressArgs memory addresses = _deploy({
+    V301L2UpgradePayload.AddressArgs memory addresses = V301L2UpgradePayload.AddressArgs({
       poolAddressesProvider: AaveV3Fantom.POOL_ADDRESSES_PROVIDER,
-      pool: AaveV3Fantom.POOL
+      pool: AaveV3Fantom.POOL,
+      poolConfigurator: AaveV3Fantom.POOL_CONFIGURATOR,
+      collector: AaveV3Fantom.COLLECTOR,
+      incentivesController: AaveV3Fantom.DEFAULT_INCENTIVES_CONTROLLER,
+      newPoolImpl: 0x84B08568906ee891de1c23175E5B92d7Df7DDCc4,
+      newPoolConfiguratorImpl: 0x7CB7fdeEB5E71f322F8E39Be67959C32a6A3aAA3,
+      newProtocolDataProvider: 0x764594F8e9757edE877B75716f8077162B251460,
+      newATokenImpl: 0x8f30ADaA6950b31f675bF8a709Bc23F55aa24735,
+      newVTokenImpl: 0x61637B1EF7e9A102e50B661D3d7dbe19ef93347e,
+      newSTokenImpl: 0xbCb167bDCF14a8F791d6f4A6EDd964aed2F8813B
     });
-    addresses.poolConfigurator = AaveV3Fantom.POOL_CONFIGURATOR;
-    addresses.collector = AaveV3Fantom.COLLECTOR;
-    addresses.incentivesController = AaveV3Fantom.DEFAULT_INCENTIVES_CONTROLLER;
 
     return
       new SwapPermissionsPayload(

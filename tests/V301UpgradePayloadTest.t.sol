@@ -140,6 +140,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
+    proposalPayload = DeployPayloads.deployAvalanche();
     _selectPayloadExecutor(AaveV3Avalanche.ACL_ADMIN);
   }
 
@@ -188,6 +189,7 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
+    proposalPayload = DeployPayloads.deployFantom();
     _selectPayloadExecutor(AaveV3Fantom.ACL_ADMIN);
   }
 
