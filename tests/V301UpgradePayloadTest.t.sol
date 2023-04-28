@@ -157,6 +157,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
+    proposalPayload = DeployPayloads.deployOptimism();
     _selectPayloadExecutor(AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
   }
 
@@ -173,6 +174,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
+    // proposalPayload = DeployPayloads.deployArbitrum();
     _selectPayloadExecutor(AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
   }
 
