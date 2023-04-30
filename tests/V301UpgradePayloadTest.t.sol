@@ -94,11 +94,18 @@ contract V301UpgradeMainnetProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('mainnet'), ForkBlocks.MAINNET);
+    proposalPayload = DeployPayloads.deployMainnet();
     _selectPayloadExecutor(AaveGovernanceV2.SHORT_EXECUTOR); // admin is the guardian
   }
 
   function testProposal() public {
+    uint128 premiumTotalBefore = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolBefore = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
     _executePayload(address(proposalPayload));
+    uint128 premiumTotalAfter = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolAfter = AaveV3Ethereum.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
+    assertEq(premiumTotalBefore, premiumTotalAfter);
+    assertEq(premiumProtocolBefore, premiumProtocolAfter);
     createConfigurationSnapshot('post-upgrade-mainnet', AaveV3Ethereum.POOL);
     diffReports('pre-upgrade-mainnet', 'post-upgrade-mainnet');
   }
@@ -110,11 +117,18 @@ contract V301UpgradePolygonProposalTest is TestWithExecutor, ProtocolV3_0_1TestB
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('polygon'), ForkBlocks.POLYGON);
+    proposalPayload = DeployPayloads.deployPolygon();
     _selectPayloadExecutor(AaveGovernanceV2.POLYGON_BRIDGE_EXECUTOR);
   }
 
   function testProposal() public {
+    uint128 premiumTotalBefore = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolBefore = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
     _executePayload(address(proposalPayload));
+    uint128 premiumTotalAfter = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TOTAL();
+    uint128 premiumProtocolAfter = AaveV3Polygon.POOL.FLASHLOAN_PREMIUM_TO_PROTOCOL();
+    assertEq(premiumTotalBefore, premiumTotalAfter);
+    assertEq(premiumProtocolBefore, premiumProtocolAfter);
     createConfigurationSnapshot('post-upgrade-polygon', AaveV3Polygon.POOL);
     diffReports('pre-upgrade-polygon', 'post-upgrade-polygon');
   }
@@ -126,6 +140,7 @@ contract V301UpgradeAvalancheProposalTest is TestWithExecutor, ProtocolV3_0_1Tes
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('avalanche'), ForkBlocks.AVALANCHE);
+    proposalPayload = DeployPayloads.deployAvalanche();
     _selectPayloadExecutor(AaveV3Avalanche.ACL_ADMIN);
   }
 
@@ -142,6 +157,7 @@ contract V301UpgradeOptimismProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('optimism'), ForkBlocks.OPTIMISM);
+    proposalPayload = DeployPayloads.deployOptimism();
     _selectPayloadExecutor(AaveGovernanceV2.OPTIMISM_BRIDGE_EXECUTOR);
   }
 
@@ -158,6 +174,7 @@ contract V301UpgradeArbitrumProposalTest is TestWithExecutor, ProtocolV3_0_1Test
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('arbitrum'), ForkBlocks.ARBITRUM);
+    // proposalPayload = DeployPayloads.deployArbitrum();
     _selectPayloadExecutor(AaveGovernanceV2.ARBITRUM_BRIDGE_EXECUTOR);
   }
 
@@ -174,6 +191,7 @@ contract V301UpgradeFantomProposalTest is TestWithExecutor, ProtocolV3_0_1TestBa
 
   function setUp() public {
     vm.createSelectFork(vm.rpcUrl('fantom'), ForkBlocks.FANTOM);
+    proposalPayload = DeployPayloads.deployFantom();
     _selectPayloadExecutor(AaveV3Fantom.ACL_ADMIN);
   }
 

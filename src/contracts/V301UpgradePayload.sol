@@ -15,6 +15,7 @@ import {IERC20Detailed} from 'aave-v3-core/contracts/dependencies/openzeppelin/c
  */
 contract V301EthereumUpgradePayload is IProposalGenericExecutor {
   IPoolAddressesProvider public immutable POOL_ADDRESSES_PROVIDER;
+  IPoolConfigurator public immutable POOL_CONFIGURATOR;
   address public immutable NEW_POOL_IMPL;
   IACLManager public immutable ACL_MANAGER;
   address immutable SWAP_COLLATERAL_ADAPTER;
@@ -25,12 +26,14 @@ contract V301EthereumUpgradePayload is IProposalGenericExecutor {
 
   constructor(
     IPoolAddressesProvider poolAddressesProvider,
+    IPoolConfigurator poolConfigurator,
     address newPoolImpl,
     IACLManager aclManager,
     address swapCollateralAdapter,
     address migrationHelper
   ) {
     POOL_ADDRESSES_PROVIDER = poolAddressesProvider;
+    POOL_CONFIGURATOR = poolConfigurator;
     NEW_POOL_IMPL = newPoolImpl;
     ACL_MANAGER = aclManager;
     SWAP_COLLATERAL_ADAPTER = swapCollateralAdapter;
@@ -39,6 +42,8 @@ contract V301EthereumUpgradePayload is IProposalGenericExecutor {
 
   function execute() public {
     POOL_ADDRESSES_PROVIDER.setPoolImpl(NEW_POOL_IMPL);
+    POOL_CONFIGURATOR.updateFlashloanPremiumTotal(0.0005e4);
+    POOL_CONFIGURATOR.updateFlashloanPremiumToProtocol(0.0004e4);
     ACL_MANAGER.grantRole(ISOLATED_COLLATERAL_SUPPLIER_ROLE, SWAP_COLLATERAL_ADAPTER);
     ACL_MANAGER.grantRole(ISOLATED_COLLATERAL_SUPPLIER_ROLE, MIGRATION_HELPER);
   }
@@ -100,6 +105,8 @@ contract V301L2UpgradePayload is IProposalGenericExecutor {
 
   function execute() public {
     POOL_ADDRESSES_PROVIDER.setPoolImpl(NEW_POOL_IMPL);
+    POOL_CONFIGURATOR.updateFlashloanPremiumTotal(0.0005e4);
+    POOL_CONFIGURATOR.updateFlashloanPremiumToProtocol(0.0004e4);
 
     POOL_ADDRESSES_PROVIDER.setPoolConfiguratorImpl(NEW_POOL_CONFIGURATOR_IMPL);
 
