@@ -15,7 +15,7 @@ contract CreateUpgradeProposal is Script {
     vm.startBroadcast();
     GovHelpers.createProposal(
       payloads,
-      0x55426ad34b9642fc138837d67391ecf707f97e5a37a09c6cfa031a7603d3ee1c
+      0x4d341d5b023269b873d952389bd067055c3ae43d978bdc13d27ad7e389e6562b
     );
     vm.stopBroadcast();
   }
